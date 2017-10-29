@@ -1,4 +1,4 @@
-package com.mjx.all;
+package com.mjx;
 
 public abstract class CKYParser {
 

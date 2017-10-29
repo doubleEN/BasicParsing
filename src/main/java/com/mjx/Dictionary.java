@@ -1,4 +1,4 @@
-package com.mjx.all;
+package com.mjx;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.mjx.all;
+package com.mjx;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,13 +10,13 @@ public abstract class Grammer {
 
     private Map<Rule, Integer> CNF = new HashMap<Rule, Integer>();
 
-    private Map<LHS, RHS[]> ltrCFG = new HashMap<LHS, RHS[]>();
+    private Map<LHS, RHS> ltrCFG = new HashMap<LHS, RHS>();
 
-    private Map<RHS[], LHS> rtlCFG = new HashMap<RHS[], LHS>();
+    private Map<RHS, LHS> rtlCFG = new HashMap<RHS, LHS>();
 
     private Map<LHS, RHS[]> ltrCNF = new HashMap<LHS, RHS[]>();
 
-    private Map<RHS[], LHS> rtlCNF = new HashMap<RHS[], LHS>();
+    private Map<RHS, LHS> rtlCNF = new HashMap<RHS, LHS>();
 
     private Dictionary dict;
 

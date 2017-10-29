@@ -1,10 +1,10 @@
-package com.mjx.all;
+package com.mjx;
 
 public class RHS {
 
-    private int[] values;
+    private String[] values;
 
-    public RHS(int... RHS) {
+    public RHS(String... RHS) {
         this.values=RHS;
     }
 
@@ -15,7 +15,7 @@ public class RHS {
     /**
      * 暴露了RHS的存储结构
      */
-    public int[] getRHS() {
+    public String[] getRHS() {
         return this.values;
     }
 

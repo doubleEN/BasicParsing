@@ -1,4 +1,4 @@
-package com.mjx.all;
+package com.mjx;
 
 public class Rule {
 
@@ -26,11 +26,11 @@ public class Rule {
         return this.rhs.len();
     }
 
-    public int getLHS() {
+    public String getLHS() {
         return this.lhs.getLHS();
     }
 
-    public int[] getRHS() {
+    public String[] getRHS() {
         return this.rhs.getRHS();
     }
 

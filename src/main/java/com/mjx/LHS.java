@@ -1,14 +1,14 @@
-package com.mjx.all;
+package com.mjx;
 
 public class LHS {
 
-    private int value;
+    private String value;
 
-    public LHS(int symbol) {
+    public LHS(String symbol) {
         this.value=symbol;
     }
 
-    public int getLHS() {
+    public String getLHS() {
         return this.value;
     }
 
