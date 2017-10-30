@@ -14,11 +14,11 @@ public class TreeBankLoading {
             treeFactory.openTreeBank(treeBank,"utf-8");
             PhraseStructureTree phraseStructureTree=null;
             while ((phraseStructureTree=treeFactory.readNextTree())!=null) {
+                System.out.println(phraseStructureTree.toString());
                 ++num;
             }
         }
         System.out.println("树库总共包含句子："+num+" 棵");//3914
-
     }
 
     /**

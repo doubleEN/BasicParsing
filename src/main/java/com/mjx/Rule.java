@@ -43,4 +43,9 @@ public class Rule {
     public int hashCode() {
         return super.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return this.lhs.toString()+"-->"+this.rhs.toString();
+    }
 }

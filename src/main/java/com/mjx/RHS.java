@@ -1,11 +1,16 @@
 package com.mjx;
 
+import java.util.Arrays;
+
 public class RHS {
 
     private String[] values;
 
+    private Dictionary dict;
+
     public RHS(String... RHS) {
-        this.values=RHS;
+        this.dict=dict;
+        this.values = RHS;
     }
 
     public int len() {
@@ -27,5 +32,10 @@ public class RHS {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(this.values);
     }
 }

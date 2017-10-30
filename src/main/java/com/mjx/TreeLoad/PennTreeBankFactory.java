@@ -1,14 +1,10 @@
 package com.mjx.TreeLoad;
 
 import com.mjx.PhraseStructureTree;
-import sun.reflect.generics.tree.Tree;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class PennTreeBankFactory implements TreeFactory {
-
 
     /**
      * 加载树库的字符流
@@ -16,7 +12,7 @@ public class PennTreeBankFactory implements TreeFactory {
     private BufferedReader br;
 
     /**
-     * 记录pennbank中树的开始一行
+     * 记录PennBank中树的开始一行
      */
     private String lastStr = "";
 
@@ -24,7 +20,7 @@ public class PennTreeBankFactory implements TreeFactory {
     }
 
     @Override
-    public void openTreeBank(String bankPath, String encoding) throws FileNotFoundException, UnsupportedEncodingException, IOException {
+    public void openTreeBank(String bankPath, String encoding) throws IOException {
         this.closeCurrentStream();
         FileInputStream fis = new FileInputStream(bankPath);
         InputStreamReader isr = new InputStreamReader(fis, encoding);
@@ -37,7 +33,6 @@ public class PennTreeBankFactory implements TreeFactory {
             throw new IOException("树库加载流未构造。");
         }
         //treeBracket取上一次迭代最后取到的值或者为""
-
         if (this.lastStr == null) {
             return null;
         }
@@ -61,8 +56,11 @@ public class PennTreeBankFactory implements TreeFactory {
         return new PhraseStructureTree(treeBracket);
     }
 
+    /**
+     * 格式化为形如：(A(B1(C1 d1)(C2 d2))(B2 d3)) 的括号表达式。叶子及其父节点用一个空格分割，其他字符紧密相连。
+     */
     @Override
-    public String format(String tree) {
+    public  String format(String tree) {
         //去除最外围的括号
         tree = tree.substring(1, tree.length() - 1).trim();
         //所有空白符替换成一位空格

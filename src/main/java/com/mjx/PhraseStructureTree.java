@@ -17,16 +17,27 @@ public class PhraseStructureTree {
     }
 
     /**
+     * 一条规则转换成节点（无用）
+     * @param rule PCFG规则
+     * @return 树节点
+     */
+    private Node ruleToNode(Rule rule) {
+        Node node = new Node(rule.getLHS());
+        node.addChildren(rule.getRHS());
+        return node;
+    }
+
+    /**
      * 一个节点转换成规则
      * @param node 一个非叶子节点
      * @return PCFG规则
      */
-    public Rule nodeToRule(Node node) {
-        if (node.leafFlag) {
+    private Rule nodeToRule(Node node) {
+        if (node.isLeaf()) {
             return null;
         }
         //获得孩子的方式重构
-        Iterator<Node> iter = node.childrenIter();
+        Iterator<Node> iter = node.children.iterator();
         String[] lhs = new String[node.numChild()];
         int num = 0;
         while (iter.hasNext()) {
@@ -38,12 +49,34 @@ public class PhraseStructureTree {
     }
 
     /**
+     * 解析PhraseStructureTree得到相应规则集(树的层序遍历)
+     */
+    public List<Rule> generateRuleSet() {
+        //使用list而不是set，避免丢失同一个树中出现多次的规则
+        List<Rule> ruleSet = new ArrayList<>();
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            Iterator<Node> iter = queue.peek().children.iterator();
+            while (iter.hasNext()) {
+                queue.offer(iter.next());
+            }
+            Node node = queue.poll();
+            if (!node.isLeaf()) {
+                Rule rule = this.nodeToRule(node);
+                ruleSet.add(rule);
+            }
+        }
+        return ruleSet;
+    }
+
+    /**
      * 解析固定格式的树的括号表达式，得到短语结构树
      * @param treeStr 树的括号表达式
      * @return 短语结构树
      */
     public void generateTree(String treeStr) {
-        //重构到一个循环中
+        //将括号、语法符号、空格各作为一个单位独立出来，方便括号表达式的解析
         List<String> parts = new ArrayList<>();
         for (int index = 0; index < treeStr.length(); ++index) {
             if (treeStr.charAt(index) == '(' || treeStr.charAt(index) == ')' || treeStr.charAt(index) == ' ') {
@@ -58,18 +91,18 @@ public class PhraseStructureTree {
                 }
             }
         }
+
         //由树的括号表达式生成树
         Stack<Node> tempStack = new Stack<>();
-
         //初始化根节点
         this.root = new Node(parts.get(1));
-
         tempStack.push(root);
         for (int index = 2; index < parts.size(); ++index) {
             String currVal = parts.get(index);
             //当为"("时，当前字符串的下一个字符串作为栈顶节点的孩子，且该字符串进栈
             if (currVal.equals("(")) {
                 Node child = new Node(parts.get(index + 1));
+                child.setFather(tempStack.peek());
                 tempStack.peek().addChild(child);
                 tempStack.push(child);
                 ++index;
@@ -77,31 +110,11 @@ public class PhraseStructureTree {
                 tempStack.pop();
             } else if (currVal.equals(" ")) {
                 Node child = new Node(parts.get(index + 1));
+                child.setFather(tempStack.peek());
                 tempStack.peek().addChild(child);
                 ++index;
             }
         }
-    }
-
-    /**
-     * 解析PhraseStructureTree得到相应规则集
-     */
-    public Set<Rule> generateRuleSet() {
-        Set<Rule> ruleSet = new HashSet<>();
-        Queue<Node> queue = new LinkedList<>();
-        queue.offer(root);
-        while (!queue.isEmpty()) {
-            Iterator<Node> iter = queue.peek().childrenIter();
-            while (iter.hasNext()) {
-                queue.offer(iter.next());
-            }
-            Node node = queue.poll();
-            if (!node.leafFlag) {
-                Rule rule = this.nodeToRule(node);
-                ruleSet.add(rule);
-            }
-        }
-        return ruleSet;
     }
 
     @Override
@@ -115,16 +128,6 @@ public class PhraseStructureTree {
          * 当前节点的符号
          */
         private String value;
-
-        /**
-         * 是否是叶子
-         */
-        private boolean leafFlag = true;
-
-        /**
-         * 是否是跟节点
-         */
-        private boolean rootFlag = true;
 
         /**
          * 父节点索引
@@ -154,16 +157,46 @@ public class PhraseStructureTree {
          * 给当前节点添加最右孩子节点
          */
         public void addChild(Node node) {
-            this.leafFlag = false;
             this.children.add(node);
+        }
+
+        /**
+         * 给当前节点添加最右孩子节点
+         */
+        public void addChild(String node) {
+            this.children.add(new Node(node));
+        }
+
+        /**
+         * 给当前节点添加数个右孩子
+         */
+        public void addChildren(String[] children) {
+            for (String child : children) {
+                this.addChild(child);
+            }
+        }
+
+        /**
+         * 给当前节点添加数个右孩子
+         */
+        public void addChildren(Node[] children) {
+            for (Node child : children) {
+                this.addChild(child);
+            }
         }
 
         /**
          * 连接父节点
          */
         public void setFather(Node father) {
-            this.rootFlag = false;
             this.father = father;
+        }
+
+        /**
+         * 连接父节点
+         */
+        public void setFather(String father) {
+            this.father = new Node(father);
         }
 
         /**
@@ -177,7 +210,7 @@ public class PhraseStructureTree {
          * 判断当前节点是否为叶子节点
          */
         public boolean isLeaf() {
-            return this.leafFlag;
+            return this.children.size()==0;
         }
 
         /**
@@ -191,32 +224,25 @@ public class PhraseStructureTree {
          * 判断当前节点是否是根
          */
         public boolean isRoot() {
-            return this.rootFlag;
-        }
-
-        /**
-         * 返回孩子节点的构造器???还是返回孩子的字符串列表？？？
-         */
-        public Iterator<Node> childrenIter() {
-            if (this.leafFlag) {
-                return null;
-            }
-            return this.children.iterator();
+            return this.father==null;
         }
 
         /**
          * 返回父节点
          */
         public String fatherVal() {
-            if (this.rootFlag) {
+            if (this.father==null) {
                 return null;
             }
             return this.father.fatherVal();
         }
 
+        /**
+         * 先序遍历打印得到树的括号表达式
+         */
         @Override
         public String toString() {
-            if (this.leafFlag) {
+            if (this.children.size()==0) {
                 return " " + this.value;
             } else {
                 String treeStr="("+this.value;

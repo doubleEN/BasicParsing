@@ -4,7 +4,10 @@ public class LHS {
 
     private String value;
 
+    private Dictionary dict;
+
     public LHS(String symbol) {
+        this.dict=dict;
         this.value=symbol;
     }
 
@@ -20,5 +23,10 @@ public class LHS {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.value;
     }
 }
