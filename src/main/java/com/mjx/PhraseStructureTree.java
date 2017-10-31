@@ -74,7 +74,7 @@ public class PhraseStructureTree {
      * 解析固定格式的树的括号表达式，得到短语结构树
      * @param treeStr 树的括号表达式
      * @return 短语结构树
-     */
+
     public void generateTree(String treeStr) {
         //将括号、语法符号、空格各作为一个单位独立出来，方便括号表达式的解析
         List<String> parts = new ArrayList<>();
@@ -116,6 +116,58 @@ public class PhraseStructureTree {
             }
         }
     }
+     */
+
+
+    /**
+     * 解析固定格式的树的括号表达式，得到短语结构树。利用两个栈实现同时将多个孩子与一个父节点连接，以便辨别规则的中心词。
+     * @param treeStr 树的括号表达式
+     * @return 短语结构树
+     * */
+    public void generateTree(String treeStr){
+        List<String> parts = new ArrayList<String>();
+        for (int index = 0; index < treeStr.length(); ++index) {
+            if (treeStr.charAt(index) == '(' || treeStr.charAt(index) == ')' || treeStr.charAt(index) == ' ') {
+                parts.add(Character.toString(treeStr.charAt(index)));
+            } else {
+                for (int i = index + 1; i < treeStr.length(); ++i) {
+                    if (treeStr.charAt(i) == '(' || treeStr.charAt(i) == ')' || treeStr.charAt(i) == ' ') {
+                        parts.add(treeStr.substring(index, i));
+                        index = i - 1;
+                        break;
+                    }
+                }
+            }
+        }
+        Stack<Node> tree = new Stack<Node>();
+        int j = 0;
+        for (int i = 0; i < parts.size(); i++) {
+            //非")"且非" "时，直接入栈
+            if(!parts.get(i).equals(")") && !parts.get(i).equals(" ")){
+                tree.push(new Node(parts.get(i)));
+            }else if(parts.get(i).equals(")")){
+                Stack<Node> temp = new Stack<Node>();
+                while(!tree.peek().getValue().equals("(")){
+                    if(!tree.peek().getValue().equals(" ")){
+                        temp.push(tree.pop());
+                    }
+                }
+                tree.pop();//左括号出栈
+                Node node = temp.pop();
+                while(!temp.isEmpty()){
+                    temp.peek().setFather(node);
+                    node.addChild(temp.pop());
+                }
+
+                if(!node.isLeaf()){
+                    node.setHeadWord(""+j++);
+                }
+                tree.push(node);
+            }
+        }
+        this.root=tree.pop();
+    }
+
 
     @Override
     public String toString() {
@@ -130,9 +182,14 @@ public class PhraseStructureTree {
         private String value;
 
         /**
+         * 当前非终止符的中心词
+         */
+        private String headWord;
+
+        /**
          * 父节点索引
          */
-        private Node father;
+        private Node parent;
 
         /**
          * 孩子结点列表
@@ -189,14 +246,21 @@ public class PhraseStructureTree {
          * 连接父节点
          */
         public void setFather(Node father) {
-            this.father = father;
+            this.parent = father;
         }
 
         /**
          * 连接父节点
          */
         public void setFather(String father) {
-            this.father = new Node(father);
+            this.parent = new Node(father);
+        }
+
+        /**
+         * 设置中心词
+         */
+        public void setHeadWord(String headWord) {
+            this.headWord=headWord;
         }
 
         /**
@@ -224,17 +288,17 @@ public class PhraseStructureTree {
          * 判断当前节点是否是根
          */
         public boolean isRoot() {
-            return this.father==null;
+            return this.parent==null;
         }
 
         /**
          * 返回父节点
          */
-        public String fatherVal() {
-            if (this.father==null) {
+        public String parentVal() {
+            if (this.parent==null) {
                 return null;
             }
-            return this.father.fatherVal();
+            return this.parent.getValue();
         }
 
         /**
