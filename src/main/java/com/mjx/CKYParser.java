@@ -1,5 +1,8 @@
 package com.mjx;
 
+import com.mjx.parsing.Grammer;
+import com.mjx.parsing.PhraseStructureTree;
+
 public abstract class CKYParser {
 
     private Grammer grammer;

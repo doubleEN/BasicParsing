@@ -1,4 +1,4 @@
-package com.mjx;
+package com.mjx.parsing;
 
 import java.util.*;
 
@@ -18,6 +18,7 @@ public class PhraseStructureTree {
 
     /**
      * 一条规则转换成节点（无用）
+     *
      * @param rule PCFG规则
      * @return 树节点
      */
@@ -29,6 +30,7 @@ public class PhraseStructureTree {
 
     /**
      * 一个节点转换成规则
+     *
      * @param node 一个非叶子节点
      * @return PCFG规则
      */
@@ -71,60 +73,12 @@ public class PhraseStructureTree {
     }
 
     /**
-     * 解析固定格式的树的括号表达式，得到短语结构树
-     * @param treeStr 树的括号表达式
-     * @return 短语结构树
-
-    public void generateTree(String treeStr) {
-        //将括号、语法符号、空格各作为一个单位独立出来，方便括号表达式的解析
-        List<String> parts = new ArrayList<>();
-        for (int index = 0; index < treeStr.length(); ++index) {
-            if (treeStr.charAt(index) == '(' || treeStr.charAt(index) == ')' || treeStr.charAt(index) == ' ') {
-                parts.add(Character.toString(treeStr.charAt(index)));
-            } else {
-                for (int i = index + 1; i < treeStr.length(); ++i) {
-                    if (treeStr.charAt(i) == '(' || treeStr.charAt(i) == ')' || treeStr.charAt(i) == ' ') {
-                        parts.add(treeStr.substring(index, i));
-                        index = i - 1;
-                        break;
-                    }
-                }
-            }
-        }
-
-        //由树的括号表达式生成树
-        Stack<Node> tempStack = new Stack<>();
-        //初始化根节点
-        this.root = new Node(parts.get(1));
-        tempStack.push(root);
-        for (int index = 2; index < parts.size(); ++index) {
-            String currVal = parts.get(index);
-            //当为"("时，当前字符串的下一个字符串作为栈顶节点的孩子，且该字符串进栈
-            if (currVal.equals("(")) {
-                Node child = new Node(parts.get(index + 1));
-                child.setFather(tempStack.peek());
-                tempStack.peek().addChild(child);
-                tempStack.push(child);
-                ++index;
-            } else if (currVal.equals(")")) {
-                tempStack.pop();
-            } else if (currVal.equals(" ")) {
-                Node child = new Node(parts.get(index + 1));
-                child.setFather(tempStack.peek());
-                tempStack.peek().addChild(child);
-                ++index;
-            }
-        }
-    }
-     */
-
-
-    /**
      * 解析固定格式的树的括号表达式，得到短语结构树。利用两个栈实现同时将多个孩子与一个父节点连接，以便辨别规则的中心词。
+     *
      * @param treeStr 树的括号表达式
      * @return 短语结构树
-     * */
-    public void generateTree(String treeStr){
+     */
+    public void generateTree(String treeStr) {
         List<String> parts = new ArrayList<String>();
         for (int index = 0; index < treeStr.length(); ++index) {
             if (treeStr.charAt(index) == '(' || treeStr.charAt(index) == ')' || treeStr.charAt(index) == ' ') {
@@ -139,33 +93,34 @@ public class PhraseStructureTree {
                 }
             }
         }
-        Stack<Node> tree = new Stack<Node>();
+        Stack<Node> stack1 = new Stack<Node>();
         int j = 0;
         for (int i = 0; i < parts.size(); i++) {
             //非")"且非" "时，直接入栈
-            if(!parts.get(i).equals(")") && !parts.get(i).equals(" ")){
-                tree.push(new Node(parts.get(i)));
-            }else if(parts.get(i).equals(")")){
-                Stack<Node> temp = new Stack<Node>();
-                while(!tree.peek().getValue().equals("(")){
-                    if(!tree.peek().getValue().equals(" ")){
-                        temp.push(tree.pop());
-                    }
+            if (!parts.get(i).equals(")") && !parts.get(i).equals(" ")) {
+                stack1.push(new Node(parts.get(i)));
+            } else if (parts.get(i).equals(")")) {
+                //栈2用来连接父与孩子
+                Stack<Node> stack2 = new Stack<Node>();
+                while (!stack1.peek().getValue().equals("(")) {
+                    stack2.push(stack1.pop());
                 }
-                tree.pop();//左括号出栈
-                Node node = temp.pop();
-                while(!temp.isEmpty()){
-                    temp.peek().setFather(node);
-                    node.addChild(temp.pop());
+                //左括号出栈
+                stack1.pop();
+                Node node = stack2.pop();
+                while (!stack2.isEmpty()) {
+                    stack2.peek().setFather(node);
+                    node.addChild(stack2.pop());
                 }
 
-                if(!node.isLeaf()){
-                    node.setHeadWord(""+j++);
+                if (!node.isLeaf()) {
+                    node.setHeadWord("" + j++);
                 }
-                tree.push(node);
+                //形成的完整子树再进栈1
+                stack1.push(node);
             }
         }
-        this.root=tree.pop();
+        this.root = stack1.pop();
     }
 
 
@@ -260,7 +215,7 @@ public class PhraseStructureTree {
          * 设置中心词
          */
         public void setHeadWord(String headWord) {
-            this.headWord=headWord;
+            this.headWord = headWord;
         }
 
         /**
@@ -274,7 +229,7 @@ public class PhraseStructureTree {
          * 判断当前节点是否为叶子节点
          */
         public boolean isLeaf() {
-            return this.children.size()==0;
+            return this.children.size() == 0;
         }
 
         /**
@@ -288,14 +243,14 @@ public class PhraseStructureTree {
          * 判断当前节点是否是根
          */
         public boolean isRoot() {
-            return this.parent==null;
+            return this.parent == null;
         }
 
         /**
          * 返回父节点
          */
         public String parentVal() {
-            if (this.parent==null) {
+            if (this.parent == null) {
                 return null;
             }
             return this.parent.getValue();
@@ -306,14 +261,14 @@ public class PhraseStructureTree {
          */
         @Override
         public String toString() {
-            if (this.children.size()==0) {
+            if (this.children.size() == 0) {
                 return " " + this.value;
             } else {
-                String treeStr="("+this.value;
-                for (Node child:this.children) {
-                    treeStr+=child.toString();
+                String treeStr = "(" + this.value;
+                for (Node child : this.children) {
+                    treeStr += child.toString();
                 }
-                treeStr+=")";
+                treeStr += ")";
                 return treeStr;
             }
         }

@@ -1,6 +1,6 @@
 package com.mjx.TreeLoad;
 
-import com.mjx.PhraseStructureTree;
+import com.mjx.parsing.PhraseStructureTree;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

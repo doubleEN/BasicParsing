@@ -1,10 +1,10 @@
 package com.mjx.applications;
 
-import com.mjx.PhraseStructureTree;
+import com.mjx.parsing.PhraseStructureTree;
 import com.mjx.TreeLoad.PennTreeBankFactory;
 import com.mjx.TreeLoad.TreeFactory;
 
-public class TreeBankLoading {
+public class PeenTreeBankLoading {
 
     public static void main(String[] args) throws Exception {
         TreeFactory treeFactory=new PennTreeBankFactory();

@@ -1,4 +1,6 @@
-package com.mjx;
+package com.mjx.parsing;
+
+import com.mjx.Dictionary;
 
 import java.util.HashMap;
 import java.util.Map;
