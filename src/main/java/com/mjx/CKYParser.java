@@ -1,7 +1,7 @@
 package com.mjx;
 
-import com.mjx.parsing.Grammer;
-import com.mjx.parsing.PhraseStructureTree;
+import com.mjx.parse.Grammer;
+import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
 
 public abstract class CKYParser {
 
@@ -28,11 +28,11 @@ public abstract class CKYParser {
         }
     }
 
-    public abstract PhraseStructureTree[] parse(String unknownSentence);
+    public abstract BasicPhraseStructureTree[] parse(String unknownSentence);
 
-    public abstract PhraseStructureTree[] parse(String[] words,String[]tags);
+    public abstract BasicPhraseStructureTree[] parse(String[] words, String[]tags);
 
     //后处理应该在Grammer中
-    public abstract PhraseStructureTree toCFGTree(PhraseStructureTree root);
+    public abstract BasicPhraseStructureTree toCFGTree(BasicPhraseStructureTree root);
 
 }

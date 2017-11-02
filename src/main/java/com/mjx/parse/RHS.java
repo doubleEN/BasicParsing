@@ -1,14 +1,10 @@
-package com.mjx.parsing;
-
-import com.mjx.Dictionary;
+package com.mjx.parse;
 
 import java.util.Arrays;
 
 public class RHS {
 
     private String[] values;
-
-    private Dictionary dict;
 
     public RHS(String... RHS) {
         this.values = RHS;
@@ -37,26 +33,12 @@ public class RHS {
             return false;
         }
 
-        if (dict == null) {
-            return Arrays.equals(this.values, ((RHS) obj).values);
-        }
-        return false;
+        return Arrays.equals(this.values, ((RHS) obj).values);
     }
 
     @Override
     public int hashCode() {
-        String lhs = Arrays.toString(this.values);
-        lhs = lhs.substring(1, lhs.length() - 1);
-        int h = 0;
-        if (this.dict == null) {
-            if (h == 0 && lhs.length() > 0) {
-                char val[] = lhs.toCharArray();
-                for (int i = 0; i < lhs.length(); i++) {
-                    h = 31 * h + val[i];
-                }
-            }
-        }
-        return h;
+        return Arrays.hashCode(this.values);
     }
 
     @Override

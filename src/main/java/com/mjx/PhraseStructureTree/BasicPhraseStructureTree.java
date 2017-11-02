@@ -1,18 +1,27 @@
-package com.mjx.parsing;
+package com.mjx.PhraseStructureTree;
+
+import com.mjx.parse.LHS;
+import com.mjx.parse.RHS;
+import com.mjx.parse.Rule;
 
 import java.util.*;
 
-public class PhraseStructureTree {
+public class BasicPhraseStructureTree {
 
     /**
      * 树根
      */
     private Node root;
 
+    BasicPhraseStructureTree() {
+        System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
+    }
+
     /**
      * 传入PhraseStructureTree能够处理的短语结构树括号表达式
      */
-    public PhraseStructureTree(String treeStr) {
+    public BasicPhraseStructureTree(String treeStr) {
+        this();
         this.generateTree(treeStr);
     }
 
@@ -93,53 +102,46 @@ public class PhraseStructureTree {
                 }
             }
         }
-        Stack<Node> stack1 = new Stack<Node>();
-        int j = 0;
-        for (int i = 0; i < parts.size(); i++) {
-            //非")"且非" "时，直接入栈
-            if (!parts.get(i).equals(")") && !parts.get(i).equals(" ")) {
-                stack1.push(new Node(parts.get(i)));
-            } else if (parts.get(i).equals(")")) {
-                //栈2用来连接父与孩子
-                Stack<Node> stack2 = new Stack<Node>();
-                while (!stack1.peek().getValue().equals("(")) {
-                    stack2.push(stack1.pop());
-                }
-                //左括号出栈
-                stack1.pop();
-                Node node = stack2.pop();
-                while (!stack2.isEmpty()) {
-                    stack2.peek().setFather(node);
-                    node.addChild(stack2.pop());
-                }
-
-                if (!node.isLeaf()) {
-                    node.setHeadWord("" + j++);
-                }
-                //形成的完整子树再进栈1
-                stack1.push(node);
+        Stack<Node> tempStack = new Stack<Node>();
+        //初始化根节点
+        this.root = new Node(parts.get(1));
+        tempStack.push(root);
+        for (int index = 2; index < parts.size(); ++index) {
+            String currVal = parts.get(index);
+            //当为"("时，当前字符串的下一个字符串作为栈顶节点的孩子，且该字符串进栈
+            if (currVal.equals("(")) {
+                Node child = new Node(parts.get(index + 1));
+                tempStack.peek().addChild(child);
+                tempStack.push(child);
+                ++index;//直接调到下一个符号考虑
+            } else if (currVal.equals(")")) {
+                tempStack.pop();
+            } else if (currVal.equals(" ")) {
+                Node child = new Node(parts.get(index + 1));
+                tempStack.peek().addChild(child);
+                ++index;
             }
         }
-        this.root = stack1.pop();
     }
-
 
     @Override
     public String toString() {
         return this.root.toString();
     }
 
-    private class Node {
+
+    void setRoot(Node root) {
+        this.root = root;
+    }
+
+    class Node {
 
         /**
          * 当前节点的符号
          */
         private String value;
 
-        /**
-         * 当前非终止符的中心词
-         */
-        private String headWord;
+
 
         /**
          * 父节点索引
@@ -200,22 +202,15 @@ public class PhraseStructureTree {
         /**
          * 连接父节点
          */
-        public void setFather(Node father) {
+        public void setParent(Node father) {
             this.parent = father;
         }
 
         /**
          * 连接父节点
          */
-        public void setFather(String father) {
+        public void setParent(String father) {
             this.parent = new Node(father);
-        }
-
-        /**
-         * 设置中心词
-         */
-        public void setHeadWord(String headWord) {
-            this.headWord = headWord;
         }
 
         /**

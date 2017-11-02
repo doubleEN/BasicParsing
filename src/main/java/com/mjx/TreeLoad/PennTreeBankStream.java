@@ -1,10 +1,12 @@
 package com.mjx.TreeLoad;
 
-import com.mjx.parsing.PhraseStructureTree;
+import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.TreeFactory.TreeFactory;
+import sun.reflect.generics.tree.Tree;
 
 import java.io.*;
 
-public class PennTreeBankFactory implements TreeFactory {
+public class PennTreeBankStream implements TreeBankStream {
 
     /**
      * 加载树库的字符流
@@ -16,19 +18,25 @@ public class PennTreeBankFactory implements TreeFactory {
      */
     private String lastStr = "";
 
-    public PennTreeBankFactory() {
+    /**
+     * 特定短语结构树的工厂
+     */
+    private TreeFactory treeFactory;
+
+    public PennTreeBankStream() {
     }
 
     @Override
-    public void openTreeBank(String bankPath, String encoding) throws IOException {
+    public void openTreeBank(String bankPath, String encoding, TreeFactory treeFactory) throws IOException {
         this.closeCurrentStream();
+        this.treeFactory=treeFactory;
         FileInputStream fis = new FileInputStream(bankPath);
         InputStreamReader isr = new InputStreamReader(fis, encoding);
         this.br = new BufferedReader(isr);
     }
 
     @Override
-    public PhraseStructureTree readNextTree() throws IOException {
+    public BasicPhraseStructureTree readNextTree() throws IOException {
         if (br == null) {
             throw new IOException("树库加载流未构造。");
         }
@@ -53,7 +61,7 @@ public class PennTreeBankFactory implements TreeFactory {
         if (line == null) {
             this.lastStr=null;
         }
-        return new PhraseStructureTree(treeBracket);
+        return this.treeFactory.createStructureTree(treeBracket);
     }
 
     /**

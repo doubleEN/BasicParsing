@@ -1,12 +1,8 @@
-package com.mjx.parsing;
-
-import com.mjx.Dictionary;
+package com.mjx.parse;
 
 public class LHS {
 
     private String value;
-
-    private Dictionary dict;
 
     public LHS(String symbol) {
         this.value = symbol;
@@ -28,24 +24,12 @@ public class LHS {
             return false;
         }
 
-        if (dict == null) {
-            return this.value.equals(((LHS) obj).value);
-        }
-        return false;
+        return this.value.equals(((LHS) obj).value);
     }
 
     @Override
     public int hashCode() {
-        int h = 0;
-        if (dict == null) {
-            if (h == 0 && value.length() > 0) {
-                char val[] = value.toCharArray();
-                for (int i = 0; i < value.length(); i++) {
-                    h = 31 * h + val[i];
-                }
-            }
-        }
-        return h;
+        return this.value.hashCode();
     }
 
     @Override

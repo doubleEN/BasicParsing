@@ -1,6 +1,4 @@
-package com.mjx.parsing;
-
-import java.util.Arrays;
+package com.mjx.parse;
 
 public class Rule {
 

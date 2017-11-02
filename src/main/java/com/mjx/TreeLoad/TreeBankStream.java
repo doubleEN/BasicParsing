@@ -1,6 +1,7 @@
 package com.mjx.TreeLoad;
 
-import com.mjx.parsing.PhraseStructureTree;
+import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.TreeFactory.TreeFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -9,17 +10,17 @@ import java.io.UnsupportedEncodingException;
 /**
  * 读取文本中的树。
  */
-public interface TreeFactory {
+public interface TreeBankStream {
 
     /**
      * 打开树库流，要能够实现文本间的读取转换
      */
-     void openTreeBank(String bankPath,String encoding)throws FileNotFoundException,UnsupportedEncodingException,IOException;
+     void openTreeBank(String bankPath,String encoding, TreeFactory treeFactory)throws FileNotFoundException,UnsupportedEncodingException,IOException;
 
     /**
      * 返回下一棵句法树
      */
-     PhraseStructureTree readNextTree() throws IOException;
+     BasicPhraseStructureTree readNextTree() throws IOException;
 
     /**
      * 关闭流

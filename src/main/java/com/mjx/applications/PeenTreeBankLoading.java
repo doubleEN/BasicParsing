@@ -1,20 +1,21 @@
 package com.mjx.applications;
 
-import com.mjx.parsing.PhraseStructureTree;
-import com.mjx.TreeLoad.PennTreeBankFactory;
-import com.mjx.TreeLoad.TreeFactory;
+import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.TreeFactory.BasicPSTFactory;
+import com.mjx.TreeLoad.PennTreeBankStream;
+import com.mjx.TreeLoad.TreeBankStream;
 
 public class PeenTreeBankLoading {
 
     public static void main(String[] args) throws Exception {
-        TreeFactory treeFactory=new PennTreeBankFactory();
+        TreeBankStream treeBankStream =new PennTreeBankStream();
         int num=0;
         for (int no = 1; no < 200; ++no) {
             String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + ensureLen(no) + ".mrg";
-            treeFactory.openTreeBank(treeBank,"utf-8");
-            PhraseStructureTree phraseStructureTree=null;
-            while ((phraseStructureTree=treeFactory.readNextTree())!=null) {
-                System.out.println(phraseStructureTree.toString());
+            treeBankStream.openTreeBank(treeBank,"utf-8",new BasicPSTFactory());
+            BasicPhraseStructureTree basicPhraseStructureTree =null;
+            while ((basicPhraseStructureTree = treeBankStream.readNextTree())!=null) {
+                System.out.println(basicPhraseStructureTree.toString());
                 ++num;
             }
         }

@@ -27,3 +27,5 @@ hs_err_pid*
 # idea
 *.iml
 .idea/workspace.xml
+将删除 .idea/
+将删除 src/main/resources/
