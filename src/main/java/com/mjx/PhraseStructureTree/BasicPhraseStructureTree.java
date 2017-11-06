@@ -32,8 +32,8 @@ public class BasicPhraseStructureTree {
      * @return 树节点
      */
     private Node ruleToNode(Rule rule) {
-        Node node = new Node(rule.getLHS());
-        node.addChildren(rule.getRHS());
+        Node node = new Node(rule.getLHS().getValue());
+        node.addChildren(rule.getRHS().getValues());
         return node;
     }
 

@@ -8,7 +8,7 @@ public class LHS {
         this.value = symbol;
     }
 
-    public String getLHS() {
+    public String getValue() {
         return this.value;
     }
 

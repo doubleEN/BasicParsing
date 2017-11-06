@@ -28,12 +28,12 @@ public class Rule {
         return this.rhs.len();
     }
 
-    public String getLHS() {
-        return this.lhs.getLHS();
+    public LHS getLHS() {
+        return this.lhs;
     }
 
-    public String[] getRHS() {
-        return this.rhs.getRHS();
+    public RHS getRHS() {
+        return this.rhs;
     }
 
     @Override
