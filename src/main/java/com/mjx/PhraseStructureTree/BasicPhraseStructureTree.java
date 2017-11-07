@@ -7,6 +7,10 @@ import com.mjx.parse.Rule;
 import java.util.*;
 
 public class BasicPhraseStructureTree {
+    public static void main(String[] args) {
+        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree("(S(NP-SBJ-1(NNS Terms))(VP(VBD were)(RB n't)(VP(VBN disclosed)(NP(-NONE- *-1))))(. .))");
+        System.out.println(basicPhraseStructureTree.printTree());
+    }
 
     /**
      * 树根
@@ -141,21 +145,21 @@ public class BasicPhraseStructureTree {
                 ++index;
             }
         }
-        this.nonterminal=nonterminal.toArray(new String[]{});
-        this.terminal=terminal.toArray(new String[]{});
+        this.nonterminal = nonterminal.toArray(new String[]{});
+        this.terminal = terminal.toArray(new String[]{});
     }
 
     /**
      * 有序返回短语结构树上的非终结符
      */
-    public String[] getNonterminal(){
+    public String[] getNonterminal() {
         return this.nonterminal;
     }
 
     /**
      * 有序返回短语结构树上的终结符
      */
-    public String[] getTerminal(){
+    public String[] getTerminal() {
         return this.terminal;
     }
 
@@ -175,7 +179,6 @@ public class BasicPhraseStructureTree {
          * 当前节点的符号
          */
         private String value;
-
 
 
         /**
@@ -302,6 +305,55 @@ public class BasicPhraseStructureTree {
                 return treeStr;
             }
         }
+    }
+
+    /**
+     * 依照PennTreeBank的格式，打印树的括号表达式
+     * 中序遍历树
+     */
+    public String printTree() {
+        int depth = 1;
+        String tree=this.printBranch(root, depth);
+        String newTree="";
+        for (int i = 0; i < tree.length(); ++i){
+            newTree+=Character.toString(tree.charAt(i));
+            if (tree.charAt(i) == '\n') {
+                newTree += "  ";//根下是\t
+            }
+        }
+        return "("+newTree+")";
+    }
+
+    /**
+     * 打印Penn树形的递归方法
+     *
+     * @param subTree 当前待打印的树
+     * @param depth   当前树的根的深度
+     * @return 树的Penn树形
+     */
+    private String printBranch(Node subTree, int depth) {
+        //当前树的缩进量
+        String indent = "";
+        for (int i = 0; i < depth; ++i) {
+            indent += "  ";
+        }
+
+        String childStr = "(" + subTree.value;
+        List<Node> children = subTree.children;
+        //当前树的孩子中的(词性 词)形式的子树，是否被其他形式的子树隔开
+        boolean tailFlag = false;
+        for (Node child : children) {
+            if (child.numChild() == 1 && child.children.get(0).isLeaf()) {
+                if (tailFlag) {
+                    childStr += "\n" + indent;
+                }
+                childStr += "(" + child.value + " " + child.children.get(0).value + ") ";//尾部加一个空格
+            } else {
+                tailFlag = true;
+                childStr += "\n" + indent + printBranch(child, depth + 1);
+            }
+        }
+        return childStr + ")";
     }
 
 }

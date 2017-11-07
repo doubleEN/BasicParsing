@@ -7,6 +7,7 @@ import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
 import com.mjx.parse.Rule;
 import junit.framework.TestCase;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -90,6 +91,35 @@ public class BasicPhraseStructureTreeTest extends TestCase {
         assertEquals(0,C1);
         assertEquals(1,C2);
         assertEquals(2,C3);
+    }
+
+    /**
+     * 测试短语结构树是否toString出与树库加载流的format一样的树
+     */
+    public void testFormatTree()throws IOException{
+
+        String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
+
+        TreeBankStream treeBankStream = new PennTreeBankStream();
+        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeBankStream.format(tree));
+
+        assertEquals(treeBankStream.format(tree),basicPhraseStructureTree.toString());
+    }
+
+    /**
+     * PennTreeBank的树形打印测试
+     */
+    public void testPrintPennTreeBank()throws IOException{
+
+        TreeBankStream treeBankStream = new PennTreeBankStream();
+        treeBankStream.openTreeBank("/home/jx_m/桌面/NLparsing/treebank/combined/wsj_0002.mrg", "utf-8",new BasicPSTFactory());
+
+        //树库中生成的短语结构树
+        BasicPhraseStructureTree psTree=treeBankStream.readNextTree();
+        //将短语结构树打印成penn形式，再格式化
+        String newPeenTree=treeBankStream.format(psTree.printTree());
+        //检验格式化后的penn树形是否与最初的格式化树一致
+        assertEquals(newPeenTree,psTree.toString());
     }
 
     /**]
