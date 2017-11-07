@@ -13,6 +13,16 @@ public class BasicPhraseStructureTree {
      */
     private Node root;
 
+    /**
+     * 树中的非终结符
+     */
+    private String[] nonterminal;
+
+    /**
+     * 树中的终结符
+     */
+    private String[] terminal;
+
     BasicPhraseStructureTree() {
         System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
     }
@@ -82,7 +92,7 @@ public class BasicPhraseStructureTree {
     }
 
     /**
-     * 解析固定格式的树的括号表达式，得到短语结构树。利用两个栈实现同时将多个孩子与一个父节点连接，以便辨别规则的中心词。
+     * 解析固定格式的树的括号表达式，得到短语结构树。同时得到终结符和非终结符。(重构，在生成树的过程中直接得到规则)
      *
      * @param treeStr 树的括号表达式
      * @return 短语结构树
@@ -105,23 +115,52 @@ public class BasicPhraseStructureTree {
         Stack<Node> tempStack = new Stack<Node>();
         //初始化根节点
         this.root = new Node(parts.get(1));
+
+        List<String> nonterminal = new ArrayList<>();
+        List<String> terminal = new ArrayList<>();
+        nonterminal.add(parts.get(1));
+
         tempStack.push(root);
         for (int index = 2; index < parts.size(); ++index) {
             String currVal = parts.get(index);
             //当为"("时，当前字符串的下一个字符串作为栈顶节点的孩子，且该字符串进栈
             if (currVal.equals("(")) {
+                nonterminal.add(parts.get(index + 1));
                 Node child = new Node(parts.get(index + 1));
                 tempStack.peek().addChild(child);
                 tempStack.push(child);
                 ++index;//直接调到下一个符号考虑
             } else if (currVal.equals(")")) {
+                //遇到")"时，当前栈顶元素出栈
                 tempStack.pop();
             } else if (currVal.equals(" ")) {
+                //遇到空格，当前下一个元素是叶子
+                terminal.add(parts.get(index + 1));
                 Node child = new Node(parts.get(index + 1));
                 tempStack.peek().addChild(child);
                 ++index;
             }
         }
+        this.nonterminal=nonterminal.toArray(new String[]{});
+        this.terminal=terminal.toArray(new String[]{});
+    }
+
+    /**
+     * 有序返回短语结构树上的非终结符
+     */
+    public String[] getNonterminal(){
+        return this.nonterminal;
+    }
+
+    /**
+     * 有序返回短语结构树上的终结符
+     */
+    public String[] getTerminal(){
+        return this.terminal;
+    }
+
+    void setRoot(Node root) {
+        this.root = root;
     }
 
     @Override
@@ -129,12 +168,8 @@ public class BasicPhraseStructureTree {
         return this.root.toString();
     }
 
-
-    void setRoot(Node root) {
-        this.root = root;
-    }
-
     class Node {
+
 
         /**
          * 当前节点的符号

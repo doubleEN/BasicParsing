@@ -13,7 +13,6 @@ public class GrammerTest extends TestCase {
         Grammer grammer=new Grammer();
         grammer.addCFGRuleSet(basicPhraseStructureTree.generateRuleSet());
 
-
         //得到的CFG规则集合
         Rule A_B = new Rule("A", "B");
         Rule B_C1C2C3 = new Rule("B", "C1","C2","C3");//右项过长的规则

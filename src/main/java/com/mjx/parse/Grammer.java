@@ -1,7 +1,5 @@
 package com.mjx.parse;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-
 import java.util.*;
 
 /**
