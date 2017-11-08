@@ -1,5 +1,7 @@
 package com.mjx.parse;
 
+import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+
 import java.util.*;
 
 /**
@@ -27,8 +29,68 @@ public class Grammer {
      */
     private Map<RHS, LHS> newRules = new HashMap<RHS, LHS>();
 
+    /**
+     * 非终结符集
+     */
+    private Set<String> nonterminals = new HashSet<>();
+
+    /**
+     * 终结符集
+     */
+    private Set<String> terminals = new HashSet<>();
+
     public Grammer() {
 
+    }
+
+    /**
+     * 添加非终结符
+     */
+    public boolean addNonterminal(String nonterminal) {
+        return this.nonterminals.add(nonterminal);
+    }
+
+    public void addNonterminals(Set<String> nonterminals) {
+        this.nonterminals.addAll(nonterminals);
+    }
+
+    /**
+     * 添加终结符
+     */
+    public boolean addTerminal(String terminal) {
+        return this.terminals.add(terminal);
+    }
+
+    public boolean addTerminals(Set<String> terminals) {
+        return this.terminals.addAll(terminals);
+    }
+
+    /**
+     * 判断是否是非终结符
+     */
+    public boolean isNonterminal(String symbol) {
+        return this.nonterminals.contains(symbol);
+    }
+
+    /**
+     * 判断是否是终结符
+     */
+    public boolean isTerminal(String symbol) {
+        return this.terminals.contains(symbol);
+    }
+
+    /**
+     * 非终结符集大小
+     */
+    public int getSizeOfNonterminals() {
+        return this.nonterminals.size();
+    }
+
+    /**
+     * 终结符集大小
+     */
+    public int getSizeOfTerminals() {
+        return this.terminals.size();
     }
 
     /**
@@ -48,17 +110,26 @@ public class Grammer {
         } else {
             ++val;
         }
-        this.CFGs.put(rule, val );
+        this.CFGs.put(rule, val);
         this.convertToCNF(rule);
     }
 
     /**
      * 添加CFG规则集
      */
-    public void addCFGRuleSet(List<Rule> rules) {
+    public void addCFGRules(List<Rule> rules) {
         for (Rule rule : rules) {
             this.addCFGRule(rule);
         }
+    }
+
+    /**
+     * 由一棵短语结构树扩充文法
+     */
+    public void expandGrammer(BasicPhraseStructureTree basicPhraseStructureTree) {
+        this.addCFGRules(basicPhraseStructureTree.generateRuleSet());
+        this.addNonterminals(basicPhraseStructureTree.getNonterminals());
+        this.addTerminals(basicPhraseStructureTree.getTerminals());
     }
 
     /**

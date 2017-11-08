@@ -20,12 +20,12 @@ public class BasicPhraseStructureTree {
     /**
      * 树中的非终结符
      */
-    private String[] nonterminal;
+    private Set<String> nonterminal;
 
     /**
      * 树中的终结符
      */
-    private String[] terminal;
+    private Set<String> terminal;
 
     BasicPhraseStructureTree() {
         System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
@@ -120,8 +120,8 @@ public class BasicPhraseStructureTree {
         //初始化根节点
         this.root = new Node(parts.get(1));
 
-        List<String> nonterminal = new ArrayList<>();
-        List<String> terminal = new ArrayList<>();
+        this.nonterminal = new HashSet<>();
+        this.terminal = new HashSet<>();
         nonterminal.add(parts.get(1));
 
         tempStack.push(root);
@@ -145,21 +145,19 @@ public class BasicPhraseStructureTree {
                 ++index;
             }
         }
-        this.nonterminal = nonterminal.toArray(new String[]{});
-        this.terminal = terminal.toArray(new String[]{});
     }
 
     /**
      * 有序返回短语结构树上的非终结符
      */
-    public String[] getNonterminal() {
+    public Set<String> getNonterminals() {
         return this.nonterminal;
     }
 
     /**
      * 有序返回短语结构树上的终结符
      */
-    public String[] getTerminal() {
+    public Set<String> getTerminals() {
         return this.terminal;
     }
 
@@ -313,15 +311,15 @@ public class BasicPhraseStructureTree {
      */
     public String printTree() {
         int depth = 1;
-        String tree=this.printBranch(root, depth);
-        String newTree="";
-        for (int i = 0; i < tree.length(); ++i){
-            newTree+=Character.toString(tree.charAt(i));
+        String tree = this.printBranch(root, depth);
+        String newTree = "";
+        for (int i = 0; i < tree.length(); ++i) {
+            newTree += Character.toString(tree.charAt(i));
             if (tree.charAt(i) == '\n') {
                 newTree += "  ";//根下是\t
             }
         }
-        return "("+newTree+")";
+        return "(" + newTree + ")";
     }
 
     /**
