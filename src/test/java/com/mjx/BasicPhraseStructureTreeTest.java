@@ -101,7 +101,6 @@ public class BasicPhraseStructureTreeTest extends TestCase {
      * PennTreeBank的树形打印测试
      */
     public void testPrintPennTreeBank()throws IOException{
-
         TreeBankStream treeBankStream = new PennTreeBankStream();
         treeBankStream.openTreeBank("/home/jx_m/桌面/NLparsing/treebank/combined/wsj_0002.mrg", "utf-8",new BasicPSTFactory());
 
@@ -112,4 +111,18 @@ public class BasicPhraseStructureTreeTest extends TestCase {
         //检验格式化后的penn树形是否与最初的格式化树一致
         assertEquals(newPeenTree,psTree.toString());
     }
+
+    /**
+     * 测试是否能够正确从短语结构树获取正确的句子
+     */
+    public void testReleatedSentence(){
+        String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
+
+        TreeBankStream treeBankStream = new PennTreeBankStream();
+        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeBankStream.format(tree));
+
+        assertEquals("c1 c2 c3",basicPhraseStructureTree.getSentence(false));
+        assertEquals("c1/B1 c2/B2 c3/A2",basicPhraseStructureTree.getSentence(true));
+    }
+
 }

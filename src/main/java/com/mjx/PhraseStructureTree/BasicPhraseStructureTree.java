@@ -8,8 +8,8 @@ import java.util.*;
 
 public class BasicPhraseStructureTree {
     public static void main(String[] args) {
-        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree("(S(NP-SBJ-1(NNS Terms))(VP(VBD were)(RB n't)(VP(VBN disclosed)(NP(-NONE- *-1))))(. .))");
-        System.out.println(basicPhraseStructureTree.printTree());
+        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree("(S(NP-SBJ(NP(DT The)(NN rise))(PP-LOC(IN in)(NP(NP(DT the)(NN stock)(POS 's))(NN price))))(VP(MD may)(ADVP(RB also))(VP(VB reflect)(NP(DT the)(NN fact)(SBAR(IN that)(S(NP-SBJ(NP(NNP USX)(POS 's))(NN steel)(NN segment))(VP(VBD fared)(ADVP(ADVP(RBR better))(PP(IN than)(NP(DT some)(JJ other)(NNS steelmakers)(POS '))))))))))(. .))");
+        System.out.println(basicPhraseStructureTree.getSentence(false));
     }
 
     /**
@@ -132,6 +132,7 @@ public class BasicPhraseStructureTree {
                 nonterminal.add(parts.get(index + 1));
                 Node child = new Node(parts.get(index + 1));
                 tempStack.peek().addChild(child);
+                child.setParent(tempStack.peek());
                 tempStack.push(child);
                 ++index;//直接调到下一个符号考虑
             } else if (currVal.equals(")")) {
@@ -141,6 +142,7 @@ public class BasicPhraseStructureTree {
                 //遇到空格，当前下一个元素是叶子
                 terminal.add(parts.get(index + 1));
                 Node child = new Node(parts.get(index + 1));
+                child.setParent(tempStack.peek());
                 tempStack.peek().addChild(child);
                 ++index;
             }
@@ -164,6 +166,31 @@ public class BasicPhraseStructureTree {
     void setRoot(Node root) {
         this.root = root;
     }
+
+    /**
+     * 生成短语结构树对应的句子(先序遍历)
+     */
+    public String getSentence(boolean tagged) {
+        return this.scanTree(this.root, tagged).trim();
+    }
+
+    private String scanTree(Node node, boolean tagged) {
+        if (node.isLeaf()) {
+            if (tagged) {
+                return " " + node.value + "/" + node.parentVal();
+            } else {
+
+                return " " + node.value;
+            }
+        }
+        List<Node> children = node.children;
+        String subStr = "";
+        for (Node child : children) {
+            subStr += this.scanTree(child, tagged);
+        }
+        return subStr;
+    }
+
 
     @Override
     public String toString() {
