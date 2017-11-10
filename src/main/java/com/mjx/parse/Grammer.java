@@ -1,6 +1,7 @@
 package com.mjx.parse;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.util.*;
 
@@ -249,4 +250,45 @@ public class Grammer {
      * CNF转CFG
      */
 //    abstract void convertToCFG();
+    public boolean isCNF(Rule rule) {
+        String[] children = rule.getRHS().getValues();
+        if (children.length == 2) {
+            for (String symbol : children){
+                if (this.isTerminal(symbol)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        if (children.length == 1) {
+            if (this.isTerminal(children[0])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 获得CFG规则集
+     */
+    public Set<Rule> getCFGs() {
+        Set<Rule> rules = new HashSet<>();
+        Set<Map.Entry<Rule, Integer>> ruleSet = this.CFGs.entrySet();
+        for (Map.Entry<Rule, Integer> rule : ruleSet) {
+            rules.add(rule.getKey());
+        }
+        return rules;
+    }
+
+    /**
+     * 获得CFG规则集
+     */
+    public Set<Rule> getCNFs() {
+        Set<Rule> rules = new HashSet<>();
+        Set<Map.Entry<Rule, Integer>> ruleSet = this.CNFs.entrySet();
+        for (Map.Entry<Rule, Integer> rule : ruleSet) {
+            rules.add(rule.getKey());
+        }
+        return rules;
+    }
 }

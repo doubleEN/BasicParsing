@@ -20,12 +20,12 @@ public class BasicPhraseStructureTree {
     /**
      * 树中的非终结符
      */
-    private Set<String> nonterminal;
+    private Set<String> nonterminal=new HashSet<>();
 
     /**
      * 树中的终结符
      */
-    private Set<String> terminal;
+    private Set<String> terminal=new HashSet<>();
 
     BasicPhraseStructureTree() {
         System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
@@ -120,8 +120,6 @@ public class BasicPhraseStructureTree {
         //初始化根节点
         this.root = new Node(parts.get(1));
 
-        this.nonterminal = new HashSet<>();
-        this.terminal = new HashSet<>();
         nonterminal.add(parts.get(1));
 
         tempStack.push(root);

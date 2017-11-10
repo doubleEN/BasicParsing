@@ -15,7 +15,7 @@ public class RHS {
     }
 
     /**
-     * 暴露了RHS的存储结构
+     * 暴露了RHS的存储结构!!!!!
      */
     public String[] getValues() {
         return this.values;
