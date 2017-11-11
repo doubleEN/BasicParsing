@@ -3,14 +3,11 @@ package com.mjx.PhraseStructureTree;
 import com.mjx.parse.LHS;
 import com.mjx.parse.RHS;
 import com.mjx.parse.Rule;
+import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.util.*;
 
 public class BasicPhraseStructureTree {
-    public static void main(String[] args) {
-        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree("(S(NP-SBJ(NP(DT The)(NN rise))(PP-LOC(IN in)(NP(NP(DT the)(NN stock)(POS 's))(NN price))))(VP(MD may)(ADVP(RB also))(VP(VB reflect)(NP(DT the)(NN fact)(SBAR(IN that)(S(NP-SBJ(NP(NNP USX)(POS 's))(NN steel)(NN segment))(VP(VBD fared)(ADVP(ADVP(RBR better))(PP(IN than)(NP(DT some)(JJ other)(NNS steelmakers)(POS '))))))))))(. .))");
-        System.out.println(basicPhraseStructureTree.getSentence(false));
-    }
 
     /**
      * 树根
@@ -166,6 +163,24 @@ public class BasicPhraseStructureTree {
     }
 
     /**
+     * 找到树根的值
+     */
+    public String getRoot(){
+        return this.root.value;
+    }
+
+    /**
+     * 找到树的最右叶子
+     */
+    public String getRightMostLeaf(){
+        Node tempNode=this.root;
+        while (!tempNode.isLeaf()) {
+            tempNode=tempNode.getRightMostChild();
+        }
+        return tempNode.value;
+    }
+
+    /**
      * 生成短语结构树对应的句子(先序遍历)
      */
     public String getSentence(boolean tagged) {
@@ -310,6 +325,13 @@ public class BasicPhraseStructureTree {
                 return null;
             }
             return this.parent.getValue();
+        }
+
+        /**
+         * 找到最右孩子节点
+         */
+        public Node getRightMostChild(){
+            return this.children.get(this.children.size() - 1);
         }
 
         /**

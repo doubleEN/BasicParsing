@@ -95,6 +95,19 @@ public class Grammer {
     }
 
     /**
+     * 终结符和非终结符的交集
+     */
+    public Set<String> symbolIntersection(){
+        Set<String> tempSet1 = new HashSet<>();
+        Set<String> tempSet2 = new HashSet<>();
+        tempSet1.addAll(this.nonterminals);
+        tempSet2.addAll(this.terminals);
+        tempSet1.retainAll(tempSet2);
+        return tempSet1;
+
+    }
+
+    /**
      * 是否包含CFG规则
      */
     public boolean containCFGRule(Rule rule) {
@@ -250,6 +263,10 @@ public class Grammer {
      * CNF转CFG
      */
 //    abstract void convertToCFG();
+
+    /**
+     * 判断一个文法是否是正则文法
+     */
     public boolean isCNF(Rule rule) {
         String[] children = rule.getRHS().getValues();
         if (children.length == 2) {
