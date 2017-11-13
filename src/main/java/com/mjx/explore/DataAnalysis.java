@@ -8,6 +8,7 @@ import com.mjx.TreeLoad.TreeBankStream;
 import com.mjx.parse.Grammer;
 import com.mjx.parse.Rule;
 import com.mjx.utils.PennTreeBankUtil;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 
 import java.io.*;
 import java.util.HashSet;
@@ -23,25 +24,29 @@ public class DataAnalysis {
         }
 
         //统计数据情况
-        String fPath=DataAnalysis.class.getResource("").getFile();
+        String fPath = DataAnalysis.class.getResource("").getFile();
 
-        analysis.printNonCNFOnCNF(fPath+"NonCNFOnCNF.txt");
-        analysis.printNonCNFOnCFG(fPath+"NonCNFOnCFG.txt");
-        analysis.printNotEnder(fPath+"NotEnder.txt");
-        analysis.printNotS(fPath+"NotS.txt");
-        analysis.printOver2(fPath+"Over2.txt");
-        analysis.printSameLandR(fPath+"SameLandR.txt");
-        analysis.printUnitProductions(fPath+"UnitProductions.txt");
-        analysis.printSameSymbol(fPath+"SameSymbol.txt");
+        analysis.printNonCNFOnCNF(fPath + "NonCNFOnCNF.txt");
+        analysis.printNonCNFOnCFG(fPath + "NonCNFOnCFG.txt");
+        analysis.printNotEnder(fPath + "NotEnder.txt");
+        analysis.printNotS(fPath + "NotS.txt");
+        analysis.printOver2(fPath + "Over2.txt");
+        analysis.printSameLandR(fPath + "SameLandR.txt");
+        analysis.printUnitProductions(fPath + "UnitProductions.txt");
+        analysis.printSameSymbol(fPath + "SameSymbol.txt");
+        analysis.printNonCNFOnCNF2(fPath + "NonCNFOnCNF2.txt");
+        analysis.printSpecialSameLR(fPath + "SpecialSameLR.txt");
+        analysis.printSpecialSymbol(fPath + "SpecialSymbol.txt");
+
     }
 
     private Grammer grammer = new Grammer();
 
     private TreeBankStream bankStream;
 
-    private Set<Rule> CFGs;
+    public Set<Rule> CFGs;
 
-    private Set<Rule> CNFs;
+    public Set<Rule> CNFs;
 
     private Set<BasicPhraseStructureTree> phraseStructureTrees = new HashSet<>();
 
@@ -63,7 +68,8 @@ public class DataAnalysis {
     }
 
     /**
-     * 输出CFG中所有非CNF规则
+     * 输出CFG中所有非CNF规则,
+     * 主要有两种情形：1.unit productions
      */
     public void printNonCNFOnCFG(String path) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(path));
@@ -116,6 +122,32 @@ public class DataAnalysis {
                 bw.write(rule.toString());
                 bw.newLine();
                 bw.flush();
+            }
+        }
+    }
+
+    /**
+     * 检查CNF中是否有不符合CNF的规则,不计标点的重复影响和unit productions
+     */
+    public void printNonCNFOnCNF2(String path) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+        for (Rule rule : this.CNFs) {
+            if (!this.grammer.isCNF(rule)) {
+                String[] lhs = rule.getRHS().getValues();
+                boolean flag = false;
+                for (String s : lhs) {
+                    if (this.grammer.isNonterminal(s) && this.grammer.isTerminal(s)) {
+                        flag = true;
+                    }
+                    if (rule.getRHS().len() == 1) {
+                        flag = true;
+                    }
+                }
+                if (!flag) {
+                    bw.write(rule.toString());
+                    bw.newLine();
+                    bw.flush();
+                }
             }
         }
     }
@@ -176,4 +208,31 @@ public class DataAnalysis {
         }
     }
 
+    /**
+     * 打印含有  NP->NP,TO->TO,VP->VP 的树
+     */
+    public void printSpecialSameLR(String path) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+        for (BasicPhraseStructureTree tree : this.phraseStructureTrees) {
+            if (tree.hasSubTree("NP", "NP") || tree.hasSubTree("TO", "TO") || tree.hasSubTree("VP", "VP")) {
+                bw.write(tree.printTree());
+                bw.newLine();
+                bw.flush();
+            }
+        }
+    }
+
+    /**
+     * 打印含有 -RRB- -LRB- 的树
+     */
+    public void printSpecialSymbol(String path) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+        for (BasicPhraseStructureTree tree : this.phraseStructureTrees) {
+            if (tree.hasNode("-RRB-") || tree.hasNode("-LRB-")) {
+                bw.write(tree.printTree());
+                bw.newLine();
+                bw.flush();
+            }
+        }
+    }
 }

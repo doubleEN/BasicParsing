@@ -3,9 +3,12 @@ package com.mjx.PhraseStructureTree;
 import com.mjx.parse.LHS;
 import com.mjx.parse.RHS;
 import com.mjx.parse.Rule;
+import com.sun.org.apache.regexp.internal.RE;
 import org.omg.CORBA.PUBLIC_MEMBER;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class BasicPhraseStructureTree {
 
@@ -17,12 +20,12 @@ public class BasicPhraseStructureTree {
     /**
      * 树中的非终结符
      */
-    private Set<String> nonterminal=new HashSet<>();
+    private Set<String> nonterminal = new HashSet<>();
 
     /**
      * 树中的终结符
      */
-    private Set<String> terminal=new HashSet<>();
+    private Set<String> terminal = new HashSet<>();
 
     BasicPhraseStructureTree() {
         System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
@@ -165,17 +168,17 @@ public class BasicPhraseStructureTree {
     /**
      * 找到树根的值
      */
-    public String getRoot(){
+    public String getRoot() {
         return this.root.value;
     }
 
     /**
      * 找到树的最右叶子
      */
-    public String getRightMostLeaf(){
-        Node tempNode=this.root;
+    public String getRightMostLeaf() {
+        Node tempNode = this.root;
         while (!tempNode.isLeaf()) {
-            tempNode=tempNode.getRightMostChild();
+            tempNode = tempNode.getRightMostChild();
         }
         return tempNode.value;
     }
@@ -202,6 +205,43 @@ public class BasicPhraseStructureTree {
             subStr += this.scanTree(child, tagged);
         }
         return subStr;
+    }
+
+
+    /**
+     * 扫描是否包含制定子树(树桩),是否可以用正则重构
+     */
+    public boolean hasSubTree(String parent, String... children) {
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(this.root);
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            if (currNode.value.equals(parent) && currNode.numChild() == children.length) {
+                boolean exitFlag = true;
+                for (int i = 0; i < currNode.numChild(); ++i) {
+                    if (!currNode.children.get(i).value.equals(children[i])) {
+                        exitFlag = false;
+                        break;
+                    }
+                }
+                if (exitFlag) {
+                    return true;
+                }
+            }
+            for (Node node : currNode.children) {
+                queue.offer(node);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 扫描是否包含制定节点
+     */
+    public boolean hasNode(String symbol) {
+        Pattern pattern=Pattern.compile(symbol);
+        Matcher matcher=pattern.matcher(this.toString());
+        return matcher.find();
     }
 
 
@@ -330,7 +370,7 @@ public class BasicPhraseStructureTree {
         /**
          * 找到最右孩子节点
          */
-        public Node getRightMostChild(){
+        public Node getRightMostChild() {
             return this.children.get(this.children.size() - 1);
         }
 
