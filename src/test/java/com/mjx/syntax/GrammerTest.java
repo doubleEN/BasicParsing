@@ -1,14 +1,18 @@
-package com.mjx.parse;
+package com.mjx.syntax;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.TreeLoad.PennTreeBankStream;
+import com.mjx.TreeLoad.TreeBankStream;
 import junit.framework.TestCase;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class GrammerTest extends TestCase {
 
-    private String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
-
     //测试是否生成的指定CFG规则集
     public void testCFG() throws Exception {
+        String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
         BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
         Grammer grammer=new Grammer();
         grammer.addCFGRules(basicPhraseStructureTree.generateRuleSet());
@@ -32,6 +36,8 @@ public class GrammerTest extends TestCase {
 
     //测试是否正确转化得到了CNF规则集
     public void testCNF() throws Exception {
+        String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
+
         BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
         Grammer grammer=new Grammer();
         grammer.addCFGRules(basicPhraseStructureTree.generateRuleSet());
@@ -49,6 +55,7 @@ public class GrammerTest extends TestCase {
     //测试是否得到正确的终结符集和非终结符集
     public void testSymbols(){
         //(A(B(C1 d1)(C2 d2)(C3 d3)))
+        String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
         BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
         Grammer grammer=new Grammer();
         grammer.expandGrammer(basicPhraseStructureTree);
@@ -66,4 +73,34 @@ public class GrammerTest extends TestCase {
         assertTrue(grammer.isTerminal("d3"));
     }
 
+
+
+    /**
+     * 测试unit productions查找
+     */
+    public void testSearchSingleChain(){
+        String tree =  "(S(A(B(C d))))";
+        String tree2 =  "(S1(A1(B1(C d))))";
+        String tree3 =  "(S2(A2(B1(f e))))";
+        TreeBankStream treeBankStream = new PennTreeBankStream();
+        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(tree);
+        BasicPhraseStructureTree basicPhraseStructureTree2 = new BasicPhraseStructureTree(tree2);
+        BasicPhraseStructureTree basicPhraseStructureTree3= new BasicPhraseStructureTree(tree3);
+
+        Grammer grammer = new Grammer();
+        grammer.expandGrammer(basicPhraseStructureTree);
+        grammer.expandGrammer(basicPhraseStructureTree2);
+        grammer.expandGrammer(basicPhraseStructureTree3);
+        String[] symbols=grammer.searchSingleChainSet("C");
+        List<String> list= Arrays.asList(symbols);
+        System.out.println(Arrays.toString(symbols));
+
+        assertEquals(9, list.size());
+        assertTrue(list.contains("S"));
+        assertTrue(list.contains("S1"));
+        assertTrue(list.contains("A"));
+        assertTrue(list.contains("A1"));
+        assertTrue(list.contains("C"));
+
+    }
 }

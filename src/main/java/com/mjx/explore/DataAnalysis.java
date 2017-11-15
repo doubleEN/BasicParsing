@@ -5,10 +5,9 @@ import com.mjx.TreeFactory.BasicPSTFactory;
 import com.mjx.TreeFactory.TreeFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
-import com.mjx.parse.Grammer;
-import com.mjx.parse.Rule;
+import com.mjx.syntax.Grammer;
+import com.mjx.syntax.Rule;
 import com.mjx.utils.PennTreeBankUtil;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 
 import java.io.*;
 import java.util.HashSet;
@@ -231,7 +230,10 @@ public class DataAnalysis {
             if (tree.hasNode("-RRB-") || tree.hasNode("-LRB-")) {
                 bw.write(tree.printTree());
                 bw.newLine();
+                bw.write(tree.getSentence(false));
+                bw.newLine();
                 bw.flush();
+
             }
         }
     }

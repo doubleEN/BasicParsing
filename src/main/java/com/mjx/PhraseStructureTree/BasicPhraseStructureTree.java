@@ -1,10 +1,8 @@
 package com.mjx.PhraseStructureTree;
 
-import com.mjx.parse.LHS;
-import com.mjx.parse.RHS;
-import com.mjx.parse.Rule;
-import com.sun.org.apache.regexp.internal.RE;
-import org.omg.CORBA.PUBLIC_MEMBER;
+import com.mjx.syntax.LHS;
+import com.mjx.syntax.RHS;
+import com.mjx.syntax.Rule;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -27,8 +25,8 @@ public class BasicPhraseStructureTree {
      */
     private Set<String> terminal = new HashSet<>();
 
-    BasicPhraseStructureTree() {
-        System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
+    public BasicPhraseStructureTree() {
+//        System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
     }
 
     /**
@@ -38,6 +36,15 @@ public class BasicPhraseStructureTree {
         this();
         this.generateTree(treeStr);
     }
+
+    /**
+     * 传入PhraseStructureTree能够处理的短语结构树括号表达式
+     */
+    public BasicPhraseStructureTree(Node root) {
+        this();
+        this.root=root;
+    }
+
 
     /**
      * 一条规则转换成节点（无用）
@@ -148,6 +155,28 @@ public class BasicPhraseStructureTree {
     }
 
     /**
+     * 提炼树中的终结符和非终结符
+     */
+    public void setSymbol() {
+        if (this.root == null) {
+            throw new IllegalArgumentException("树为构造完成，不能提炼树节点");
+        }
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            Node node = queue.poll();
+            if (node.isLeaf()) {
+                this.terminal.add(node.value);
+            } else {
+                this.nonterminal.add(node.value);
+            }
+            for (Node n : node.children) {
+                queue.offer(n);
+            }
+        }
+    }
+
+    /**
      * 有序返回短语结构树上的非终结符
      */
     public Set<String> getNonterminals() {
@@ -161,8 +190,11 @@ public class BasicPhraseStructureTree {
         return this.terminal;
     }
 
-    void setRoot(Node root) {
-        this.root = root;
+    /**
+     * 设置根
+     */
+    public void setRoot(Node root) {
+        this.root=root;
     }
 
     /**
@@ -236,11 +268,11 @@ public class BasicPhraseStructureTree {
     }
 
     /**
-     * 扫描是否包含制定节点
+     * 扫描是否包含制定节点(直接遍历树太慢)
      */
     public boolean hasNode(String symbol) {
-        Pattern pattern=Pattern.compile(symbol);
-        Matcher matcher=pattern.matcher(this.toString());
+        Pattern pattern = Pattern.compile(symbol);
+        Matcher matcher = pattern.matcher(this.toString());
         return matcher.find();
     }
 
@@ -250,8 +282,32 @@ public class BasicPhraseStructureTree {
         return this.root.toString();
     }
 
-    class Node {
+    /**
+     * 先序遍历
+     */
+    public String dictTree() {
+        int depth=0;
+        return this.partTree(root,depth);
+    }
 
+    private String partTree(Node node,int depth){
+        if (node.isLeaf()) {
+            return "\""+node.value+"\"";
+        }
+        String subStr="{\""+node.value+"\":{";
+        for (int i=0;i< node.children.size();++i) {
+            if (i == node.children.size() - 1) {
+                depth++;
+                subStr+="\"--"+depth+"\":"+this.partTree(node.children.get(i),depth)+"}";
+            } else {
+                depth++;
+                subStr+="\"--"+depth+"\":"+this.partTree(node.children.get(i),depth)+",";
+            }
+        }
+        return subStr+"}";
+    }
+
+    public static class Node {
 
         /**
          * 当前节点的符号
@@ -351,6 +407,13 @@ public class BasicPhraseStructureTree {
         }
 
         /**
+         * 获得所有孩子
+         */
+        public Node[] getChildren() {
+            return this.children.toArray(new Node[]{});
+        }
+
+        /**
          * 判断当前节点是否是根
          */
         public boolean isRoot() {
@@ -440,5 +503,4 @@ public class BasicPhraseStructureTree {
         }
         return childStr + ")";
     }
-
 }

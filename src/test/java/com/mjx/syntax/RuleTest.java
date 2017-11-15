@@ -1,4 +1,4 @@
-package com.mjx.parse;
+package com.mjx.syntax;
 
 import junit.framework.TestCase;
 

@@ -4,13 +4,12 @@ import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
 import com.mjx.TreeFactory.BasicPSTFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
-import com.mjx.parse.Grammer;
+import com.mjx.syntax.Grammer;
 import com.mjx.utils.PennTreeBankUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.Buffer;
 
 public class PeenTreeBankLoading {
 
