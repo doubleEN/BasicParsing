@@ -21,7 +21,7 @@ public class Parser2 extends CKYParser {
                 grammer.expandGrammer(phraseStructureTree);
             }
         }
-        grammer.eliminateUnitProductions();
+        grammer.convertToCNFs();
         CKYParser ckyParser = new Parser2(grammer);
         BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Clark J. Vitulli");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {

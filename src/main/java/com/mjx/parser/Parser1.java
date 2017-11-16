@@ -25,7 +25,7 @@ public class Parser1 extends CKYParser{
             }
         }
 
-        grammer.eliminateUnitProductions();
+        grammer.convertToCNFs();
 
         CKYParser ckyParser = new Parser1(grammer);
 
