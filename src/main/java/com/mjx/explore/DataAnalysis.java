@@ -21,7 +21,7 @@ public class DataAnalysis {
             String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
             analysis.loadBank(treeBank, "utf-8", new BasicPSTFactory());
         }
-
+        analysis.convertCNF();
         //统计数据情况
         String fPath = DataAnalysis.class.getResource("").getFile();
 
@@ -36,7 +36,8 @@ public class DataAnalysis {
         analysis.printNonCNFOnCNF2(fPath + "NonCNFOnCNF2.txt");
         analysis.printSpecialSameLR(fPath + "SpecialSameLR.txt");
         analysis.printSpecialSymbol(fPath + "SpecialSymbol.txt");
-
+        analysis.printUnitProductionsTree(fPath + "UnitProductionsTree.txt");
+        analysis.print(fPath + "wrong.txt");
     }
 
     private Grammer grammer = new Grammer();
@@ -57,11 +58,15 @@ public class DataAnalysis {
         this.bankStream.openTreeBank(bankPath, encoding, treeFactory);
         BasicPhraseStructureTree phraseStructureTree = null;
         while ((phraseStructureTree = this.bankStream.readNextTree()) != null) {
-            System.out.println(phraseStructureTree);
+//            System.out.println(phraseStructureTree);
             this.phraseStructureTrees.add(phraseStructureTree);
             this.grammer.expandGrammer(phraseStructureTree);
 
         }
+    }
+
+    public void convertCNF() {
+        this.grammer.convertToCNFs();
         this.CFGs = this.grammer.getCFGs();
         this.CNFs = this.grammer.getCNFs();
     }
@@ -237,4 +242,35 @@ public class DataAnalysis {
             }
         }
     }
+
+    //打印含有unit productions的树
+    public void printUnitProductionsTree(String path) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+        for (BasicPhraseStructureTree tree : this.phraseStructureTrees) {
+            String t = "";
+            if (tree.hasUnitProductions() != null) {
+                bw.write(tree.dictTree());
+                bw.newLine();
+                bw.flush();
+            }
+        }
+    }
+
+    /**
+     *  从属性上看unit productions的不同情形:
+     *  1.nonterminal-->nonterminal-->terminal；
+     *  2.nonterminal-->nonterminal-->[nonterminal1  nonterminal2];
+     */
+    public void print(String path) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(path));
+        for (BasicPhraseStructureTree tree : this.phraseStructureTrees) {
+            String t = "";
+            if (tree.has3GramUnitProductions() == null && (t = tree.hasUnitProductions()) != null) {
+                bw.write(t);
+                bw.newLine();
+                bw.flush();
+            }
+        }
+    }
+
 }

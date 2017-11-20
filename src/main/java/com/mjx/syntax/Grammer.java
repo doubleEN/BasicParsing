@@ -10,7 +10,7 @@ import java.util.*;
 public class Grammer {
 
     /**
-     * CFG,上下文无关文法规则集
+     * PennCFG,上下文无关文法规则集
      */
     private Map<Rule, Integer> CFGs = new HashMap<Rule, Integer>();
 
@@ -22,12 +22,12 @@ public class Grammer {
     /**
      * CNF由右部派生左部的映射集
      */
-    private Map<RHS, Set<LHS>> rtlCNF;
+    private Map<RHS, Set<LHS>> rtl;
 
     /**
      * CNF由右部派生左部的映射集
      */
-    private Map<LHS, Set<RHS>> ltrCNF;
+    private Map<LHS, Set<RHS>> ltr;
 
     /**
      * 非终结符集
@@ -103,8 +103,8 @@ public class Grammer {
      */
     public void convertToCNFs() {
         this.CNFs = new HashMap<>();
-        this.ltrCNF = new HashMap<>();
-        this.rtlCNF = new HashMap<>();
+        this.ltr = new HashMap<>();
+        this.rtl = new HashMap<>();
         Set<Rule> CFG = this.getCFGs();
 
         Map<RHS, LHS> newRules1 = new HashMap<>();
@@ -208,7 +208,6 @@ public class Grammer {
             }
         }
         //309884条unit productions衍生的规则
-        System.out.println(newRules.size());
         return newRules;
     }
 
@@ -252,19 +251,19 @@ public class Grammer {
     private void addCNFMapping(Rule rule) {
         LHS lhs = rule.getLHS();
         RHS rhs = rule.getRHS();
-        if (this.rtlCNF.get(rhs) == null) {
+        if (this.rtl.get(rhs) == null) {
             Set<LHS> set = new HashSet<>();
             set.add(lhs);
-            this.rtlCNF.put(rhs, set);
+            this.rtl.put(rhs, set);
         } else {
-            this.rtlCNF.get(rhs).add(lhs);
+            this.rtl.get(rhs).add(lhs);
         }
-        if (this.ltrCNF.get(lhs) == null) {
+        if (this.ltr.get(lhs) == null) {
             Set<RHS> set = new HashSet<>();
             set.add(rhs);
-            this.ltrCNF.put(lhs, set);
+            this.ltr.put(lhs, set);
         } else {
-            this.ltrCNF.get(lhs).add(rhs);
+            this.ltr.get(lhs).add(rhs);
         }
     }
 
@@ -288,7 +287,7 @@ public class Grammer {
             return;
         }
         tempSet.add(symbol);
-        Set<LHS> lhsSet = this.rtlCNF.get(new RHS(symbol));
+        Set<LHS> lhsSet = this.rtl.get(new RHS(symbol));
         if (lhsSet == null) {
             return;
         }
@@ -299,10 +298,10 @@ public class Grammer {
 
     public Set<LHS> searchLHS(String... RHS) {
         if (RHS.length == 1) {
-            return this.rtlCNF.get(new RHS(RHS[0]));
+            return this.rtl.get(new RHS(RHS[0]));
         }
         if (RHS.length == 2) {
-            return this.rtlCNF.get(new RHS(RHS[0], RHS[1]));
+            return this.rtl.get(new RHS(RHS[0], RHS[1]));
         } else {
             throw new IllegalArgumentException("正则文法的RHS长度为1或2.");
         }
@@ -409,7 +408,7 @@ public class Grammer {
     }
 
     /**
-     * (CFG)终结符和非终结符的交集
+     * (PennCFG)终结符和非终结符的交集
      */
     public Set<String> symbolIntersection() {
         Set<String> tempSet1 = new HashSet<>();

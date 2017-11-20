@@ -52,6 +52,7 @@ public class BasicPhraseStructureTree {
      * @param rule PCFG规则
      * @return 树节点
      */
+    @Deprecated
     private Node ruleToNode(Rule rule) {
         Node node = new Node(rule.getLHS().getValue());
         node.addChildren(rule.getRHS().getValues());
@@ -239,6 +240,67 @@ public class BasicPhraseStructureTree {
         return subStr;
     }
 
+    /**
+     * 直接从树形上处理unit productions情况
+     * 1.A-->B-->[C D]：A-->[C D],B-->[C D]
+     * 2.A-->B-->d:A-->d,B-->d
+     */
+    public Map<String[],Rule> getUnitProductionsChain(){
+        Map<String[], Rule> chain = new HashMap<>();
+
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(this.root);
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            if (currNode.numChild() == 1 && currNode.children.get(0).numChild() > 1) {
+                // A-->B-->[C D]
+
+            } else if (currNode.numChild() == 1 && currNode.children.get(0).children.get(0).isLeaf()) {
+                //A-->B-->d
+
+            }
+            for (Node node : currNode.children) {
+                queue.offer(node);
+            }
+        }
+        return chain;
+    }
+
+    /**
+     * 扫描是否包含unit productions
+     */
+    public String  hasUnitProductions() {
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(this.root);
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            if (currNode.numChild()==1&&!currNode.children.get(0).isLeaf()) {
+                return currNode.value + "-->" + currNode.children.get(0).value+"-->"+currNode.children.get(0).children;
+            }
+            for (Node node : currNode.children) {
+                queue.offer(node);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 扫描是否包含长度为3的unit productions,结构为 nonT-->nonT-->T
+     */
+    public String has3GramUnitProductions() {
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(this.root);
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            if (currNode.numChild()==1&&currNode.children.get(0).numChild()==1&&currNode.children.get(0).children.get(0).isLeaf()) {
+                return currNode.value+"-->"+currNode.children.get(0).value+"-->"+currNode.children.get(0).children.get(0).value;
+            }
+            for (Node node : currNode.children) {
+                queue.offer(node);
+            }
+        }
+        return null;
+    }
 
     /**
      * 扫描是否包含制定子树(树桩),是否可以用正则重构
@@ -268,7 +330,7 @@ public class BasicPhraseStructureTree {
     }
 
     /**
-     * 扫描是否包含制定节点(直接遍历树太慢)
+     * 扫描是否包含指定节点(直接遍历树太慢)
      */
     public boolean hasNode(String symbol) {
         Pattern pattern = Pattern.compile(symbol);

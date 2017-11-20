@@ -1,6 +1,7 @@
 package com.mjx.parser;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.syntax.CNF;
 import com.mjx.syntax.Grammer;
 import com.mjx.syntax.LHS;
 
@@ -11,7 +12,7 @@ public abstract class CKYParser {
     /**
      * 文法集
      */
-    private Grammer grammer;
+    private CNF cnf;
 
     /**
      * 词序列
@@ -38,8 +39,8 @@ public abstract class CKYParser {
      */
     private int count = 0;
 
-    public CKYParser(Grammer grammer) {
-        this.grammer = grammer;
+    public CKYParser(CNF cnf) {
+        this.cnf = cnf;
     }
 
     /**
@@ -54,11 +55,10 @@ public abstract class CKYParser {
     }
 
     /**
-     * 给定词性的情况下，解析句法树
+     * 无词性的情况下，解析句法树
      */
-    public BasicPhraseStructureTree[] parsing(String[] words, String[] tags) throws CloneNotSupportedException {
+    public BasicPhraseStructureTree[] parsing(String[] words) throws CloneNotSupportedException {
         this.words = words;
-        this.tags = tags;
 
         this.recognize();
 
@@ -66,10 +66,11 @@ public abstract class CKYParser {
     }
 
     /**
-     * 无词性的情况下，解析句法树
+     * 给定词性的情况下，解析句法树
      */
-    public BasicPhraseStructureTree[] parsing(String[] words) throws CloneNotSupportedException {
+    public BasicPhraseStructureTree[] parsing(String[] words, String[] tags) throws CloneNotSupportedException {
         this.words = words;
+        this.tags = tags;
 
         this.recognize();
 
@@ -99,10 +100,11 @@ public abstract class CKYParser {
 
         //遍历矩阵每行
         for (int row = 0; row < wordLen; ++row) {
+            System.out.println("解析到词："+this.words[row]);
             String[] singleLHSs = null;
             //首先填充词汇的LHS
             if (this.tags == null) {
-                LHS[]lhs = grammer.searchLHS(this.words[row]).toArray(new LHS[]{});
+                LHS[]lhs = cnf.searchLHS(this.words[row]).toArray(new LHS[]{});
                 singleLHSs = new String[lhs.length];
                 for (int i=0;i<lhs.length;++i) {
                     singleLHSs[i] = lhs[i].getValue();
@@ -133,7 +135,7 @@ public abstract class CKYParser {
                     for (int first = 0; first < firstChild.length; ++first) {
                         for (int second = 0; second < secondChild.length; ++second) {
                             //查找可能的LHS
-                            Set<LHS> partLHS = this.grammer.searchLHS(firstChild[first], secondChild[second]);
+                            Set<LHS> partLHS = this.cnf.searchLHS(firstChild[first], secondChild[second]);
                             //可能不存在这样的LHS
                             if (partLHS == null) {
                                 continue;
