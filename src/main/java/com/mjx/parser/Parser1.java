@@ -14,7 +14,7 @@ public class Parser1 extends CKYParser{
         CNF pennCFG = new PennCFG();
         //加载PennTreeBank
         for (int no = 1; no < 200; ++no) {
-            String treeBank = "C:\\Users\\2en\\Desktop\\treebank\\combined\\wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
+            String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
             bankStream.openTreeBank(treeBank, "utf-8", new BasicPSTFactory());
             BasicPhraseStructureTree phraseStructureTree = null;
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
@@ -26,7 +26,7 @@ public class Parser1 extends CKYParser{
 
         CKYParser ckyParser = new Parser1(pennCFG);
 
-        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Clark/NNP J./NNP Vitulli/NNP");
+        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Mr./NNP Vinken/NNP is/VBZ chairman/NN of/IN Elsevier/NNP N.V./NNP ./. ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
             System.out.println(phraseStructureTree.toString());
         }

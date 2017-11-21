@@ -15,7 +15,7 @@ public class Parser2 extends CKYParser {
         CNF pennCFG = new PennCFG();
         //加载PennTreeBank
         for (int no = 1; no < 200; ++no) {
-            String treeBank = "C:\\Users\\2en\\Desktop\\treebank\\combined\\wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
+            String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
             bankStream.openTreeBank(treeBank, "utf-8", new BasicPSTFactory());
             BasicPhraseStructureTree phraseStructureTree = null;
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
@@ -25,9 +25,9 @@ public class Parser2 extends CKYParser {
         pennCFG.convertToCNFs();
         CKYParser ckyParser = new Parser2(pennCFG);
         // 句子长度为13，跑到N.V.时，栈溢出
-        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Clark J. Vitulli");
+        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Mr. Vinken is chairman of Elsevier N.V. . ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
-            System.out.println(phraseStructureTree.printTree());
+            System.out.println(phraseStructureTree);
         }
     }
 

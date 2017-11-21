@@ -242,22 +242,25 @@ public class BasicPhraseStructureTree {
                 // A-->B-->[C D ...]
                 Rule[] rules=new Rule[2];
                 rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
-                String[] _rhs=currNode.children.get(0).children.toArray(new String[]{});
+                String[] _rhs=new String[currNode.children.get(0).numChild()];
+                for (int i=0;i<currNode.children.get(0).numChild();++i) {
+                    _rhs[i] = currNode.children.get(0).children.get(i).value;
+                }
                 rules[1] = new Rule(currNode.children.get(0).value,_rhs);
-                int num=chain.get(rules);
-                if (num > 0) {
+                Integer num=chain.get(rules);
+                if (num !=null) {
                     ++num;
                 } else {
                     num=1;
                 }
                 chain.put(rules, num);
-            } else if (currNode.numChild() == 1 && currNode.children.get(0).children.get(0).isLeaf()) {
+            } else if (currNode.numChild() == 1 && currNode.children.get(0).numChild()==1) {
                 //A-->B-->d
                 Rule[] rules=new Rule[2];
                 rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
                 rules[1] = new Rule(currNode.children.get(0).value,currNode.children.get(0).children.get(0).value);
-                int num=chain.get(rules);
-                if (num > 0) {
+                Integer num=chain.get(rules);
+                if (num !=null) {
                     ++num;
                 } else {
                     num=1;

@@ -2,10 +2,7 @@ package com.mjx.syntax;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class PennCFG extends CNF {
     /**
@@ -26,12 +23,12 @@ public class PennCFG extends CNF {
     }
 
     private void addRuleChain(Map<Rule[], Integer> ruleChains) {
-        Set<Map.Entry<Rule[], Integer>> entries = new HashSet<>();
+        Set<Map.Entry<Rule[], Integer>> entries = ruleChains.entrySet();
         for (Map.Entry<Rule[], Integer> entry : entries) {
-            if (ruleChains.get(entry.getKey())==null) {
-                ruleChains.put(entry.getKey(), entry.getValue());
+            if (ruleChains.get(entry.getKey()) == null) {
+                this.ruleChains.put(entry.getKey(), entry.getValue());
             } else {
-                ruleChains.put(entry.getKey(), entry.getValue() + ruleChains.get(entry.getKey()));
+                this.ruleChains.put(entry.getKey(), entry.getValue() + ruleChains.get(entry.getKey()));
             }
         }
     }
@@ -74,42 +71,72 @@ public class PennCFG extends CNF {
     public void convertToCNFs() {
         this.constructCNF();
 
-        Set<Rule> CFG = this.getCFGs();
-        Map<RHS, LHS> newRules1 = new HashMap<>();
+        Map<Rule, Integer> tempRules = new HashMap<>();
+        tempRules.putAll(this.CFGRules);
 
-        Set<Rule> singleRule = new HashSet<>();
-        Map<LHS, Set<RHS>> ltr = new HashMap<>();
-
-        for (Rule rule : CFG) {
-            if (rule.getRHS().len() > 2) {
-                this.cutLongRHS(rule, newRules1);
-            } else if (rule.getRHS().len() == 1) {
-                //单链派生
-                singleRule.add(rule);
-                Set<RHS> RHSsET = ltr.get(rule.getLHS());
-                if (RHSsET == null) {
-                    Set<RHS> _rhs = new HashSet<>();
-                    _rhs.add(rule.getRHS());
-                    ltr.put(rule.getLHS(), _rhs);
+        //处理unit productions,且在正则文法规则和long rhs之前处理，因为存在A-->B-->C D..，这样的语法
+        Iterator<Map.Entry<Rule[], Integer>> iter1 = this.ruleChains.entrySet().iterator();
+        while (iter1.hasNext()) {
+            Map.Entry<Rule[], Integer> chain = iter1.next();
+            Rule rule1 = chain.getKey()[0];
+            Rule rule2 = chain.getKey()[1];
+            if (rule2.lenOfRHS() > 1) {
+                //A-->B-->CDE..转化为A-->CDE..，放入tempRules，以便对long RHS进行处理
+                Rule newRule = new Rule(rule1.getLHS(), rule2.getRHS());
+                Integer num = tempRules.get(newRule);
+                if (num == null) {
+                    tempRules.put(newRule, chain.getValue());
                 } else {
-                    RHSsET.add(rule.getRHS());
+                    tempRules.put(newRule, chain.getValue() + num);
                 }
-            } else {
-                this.addCNFRule(rule);//CFG上的正则文法
+                //删除处理完的unit productions，可能重复删除
+                tempRules.remove(rule1);
+                tempRules.remove(rule2);
+            } else if (rule2.lenOfRHS() == 1) {
+                //A-->B-->d转化为A-->d
+                Rule newRule = new Rule(rule1.getLHS(), rule2.getRHS());
+                // 1.一般的unit productions处理后加入CNF
+                this.addCNFRule(newRule);
+                tempRules.remove(rule1);
+                tempRules.remove(rule2);
             }
         }
-        Set<Rule> newRules2 = this.eliminateUnitProductions(singleRule, ltr);
 
-        for (Rule rule : newRules2) {
-            this.addCNFRule(rule);
+        Iterator<Map.Entry<Rule, Integer>> iter2 = tempRules.entrySet().iterator();
+        //筛选CFG中存在的CNF规则
+        while (iter2.hasNext()) {
+            Rule _rule = iter2.next().getKey();
+            //Penn上，rhs长度为2的规则，一定属于正则文法
+            if (_rule.lenOfRHS() == 2) {
+                // 2.CFG上正则文法规则加入CNF
+                this.addCNFRule(_rule);
+                iter2.remove();
+            } else if (_rule.lenOfRHS() == 1 && this.isTerminal(_rule.getRHS().getValues()[0])) {
+                // 3.正常的词性规则加入CNF
+                this.addCNFRule(_rule);
+                iter2.remove();
+            }
         }
 
-        Set<Map.Entry<RHS, LHS>> entries = newRules1.entrySet();
+        //开始处理longRHS，没有正确处理计数
+        Map<RHS, LHS> newRules = new HashMap<>();
+
+        Iterator<Map.Entry<Rule, Integer>> iter3 = tempRules.entrySet().iterator();
+
+        while (iter3.hasNext()) {
+            Map.Entry<Rule, Integer> entry = iter3.next();
+            if (entry.getKey().lenOfRHS() < 3) {
+                throw new IllegalArgumentException("存在RHS长度低于3的规则未处理完。");
+            }
+            this.cutLongRHS(entry.getKey(), newRules);
+        }
+
+        Set<Map.Entry<RHS, LHS>> entries = newRules.entrySet();
+        // 4.longRHS处理过后加入正则文法集
         for (Map.Entry<RHS, LHS> entry : entries) {
             this.addCNFRule(new Rule(entry.getValue(), entry.getKey()));
         }
     }
-
 
     /**
      * 将右项长度大于2的上下文无关文法转换成乔姆斯基正则文法
@@ -154,52 +181,4 @@ public class PennCFG extends CNF {
             }
         }
     }
-
-
-    /**
-     * 去除unit productions
-     * bug 是否存在unit productions 无法派生到词汇的情况，这种情况如何处理
-     */
-    private Set<Rule> eliminateUnitProductions(Set<Rule> singleRule, Map<LHS, Set<RHS>> ltr) {
-        Set<Rule> newRules = new HashSet<>();
-        //消除每一个unit productions
-        for (Rule rule : singleRule) {
-            //RHS是非终结符，且RHS和LHS不一样的情况下。
-            if (!rule.getLHS().getValue().equals(rule.getRHS().getValues()[0]) && this.isNonterminal(rule.getRHS().getValues()[0])) {
-                Set<RHS> set = ltr.get(rule.getLHS());
-                for (RHS rhs : set) {
-                    //自身派生自身到底如何处理
-                    if (!rhs.getValues()[0].equals(rule.getLHS().getValue())) {
-                        this.searchLexicon(rule.getLHS(), rhs, newRules, ltr);
-                    }
-                }
-            } else {
-                newRules.add(rule);//直接添加正则派生规则
-            }
-        }
-        //309884条unit productions衍生的规则
-        return newRules;
-    }
-
-    private void searchLexicon(LHS fistLHS, RHS rhs, Set<Rule> newRules, Map<LHS, Set<RHS>> ltr) {
-        //不将自身派生自身的情况加入新规则集
-        if (fistLHS.getValue().equals(rhs.getValues()[0])) {
-            return;
-        }
-        if (this.isTerminal(rhs.getValues()[0]) && !fistLHS.getValue().equals(rhs.getValues()[0])) {
-            newRules.add(new Rule(fistLHS, rhs));
-            return;
-        }
-        Set<RHS> set = ltr.get(new LHS(rhs.getValues()[0]));
-        if (set == null) {
-            return;
-        }
-        for (RHS rhs1 : set) {
-            //非终结符派生自己产生的死循环,但没有几个符号之间的死循环
-            if (rhs1.len() == 1 && !rhs1.getValues()[0].equals(rhs.getValues()[0])) {
-                this.searchLexicon(fistLHS, rhs1, newRules, ltr);
-            }
-        }
-    }
-
 }
