@@ -45,20 +45,6 @@ public class BasicPhraseStructureTree {
         this.root=root;
     }
 
-
-    /**
-     * 一条规则转换成节点（无用）
-     *
-     * @param rule PCFG规则
-     * @return 树节点
-     */
-    @Deprecated
-    private Node ruleToNode(Rule rule) {
-        Node node = new Node(rule.getLHS().getValue());
-        node.addChildren(rule.getRHS().getValues());
-        return node;
-    }
-
     /**
      * 一个节点转换成规则
      *
@@ -241,23 +227,42 @@ public class BasicPhraseStructureTree {
     }
 
     /**
-     * 直接从树形上处理unit productions情况
-     * 1.A-->B-->[C D]：A-->[C D],B-->[C D]
-     * 2.A-->B-->d:A-->d,B-->d
+     * 直接从树形上处理unit productions情况。直接处理PennTreeBank上的两种unit productions 情况：
+     *  1.A-->B-->[C D]
+     *  2.A-->B-->d
+     * @return 返回unit productions的链式结构
      */
-    public Map<String[],Rule> getUnitProductionsChain(){
-        Map<String[], Rule> chain = new HashMap<>();
-
+    public Map<Rule[],Integer> getUnitProductionsChain(){
+        Map<Rule[], Integer> chain = new HashMap<>();
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.root);
         while (!queue.isEmpty()) {
             Node currNode = queue.poll();
             if (currNode.numChild() == 1 && currNode.children.get(0).numChild() > 1) {
-                // A-->B-->[C D]
-
+                // A-->B-->[C D ...]
+                Rule[] rules=new Rule[2];
+                rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
+                String[] _rhs=currNode.children.get(0).children.toArray(new String[]{});
+                rules[1] = new Rule(currNode.children.get(0).value,_rhs);
+                int num=chain.get(rules);
+                if (num > 0) {
+                    ++num;
+                } else {
+                    num=1;
+                }
+                chain.put(rules, num);
             } else if (currNode.numChild() == 1 && currNode.children.get(0).children.get(0).isLeaf()) {
                 //A-->B-->d
-
+                Rule[] rules=new Rule[2];
+                rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
+                rules[1] = new Rule(currNode.children.get(0).value,currNode.children.get(0).children.get(0).value);
+                int num=chain.get(rules);
+                if (num > 0) {
+                    ++num;
+                } else {
+                    num=1;
+                }
+                chain.put(rules, num);
             }
             for (Node node : currNode.children) {
                 queue.offer(node);

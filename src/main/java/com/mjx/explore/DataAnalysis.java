@@ -5,7 +5,8 @@ import com.mjx.TreeFactory.BasicPSTFactory;
 import com.mjx.TreeFactory.TreeFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
-import com.mjx.syntax.Grammer;
+import com.mjx.syntax.CNF;
+import com.mjx.syntax.PennCFG;
 import com.mjx.syntax.Rule;
 import com.mjx.utils.PennTreeBankUtil;
 
@@ -18,7 +19,7 @@ public class DataAnalysis {
         DataAnalysis analysis = new DataAnalysis(new PennTreeBankStream());
         //加载PennTreeBank
         for (int no = 1; no < 200; ++no) {
-            String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
+            String treeBank = "C:\\Users\\2en\\Desktop\\treebank\\combined\\wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
             analysis.loadBank(treeBank, "utf-8", new BasicPSTFactory());
         }
         analysis.convertCNF();
@@ -40,7 +41,7 @@ public class DataAnalysis {
         analysis.print(fPath + "wrong.txt");
     }
 
-    private Grammer grammer = new Grammer();
+    private CNF grammer=new PennCFG();
 
     private TreeBankStream bankStream;
 

@@ -4,7 +4,8 @@ import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
 import com.mjx.TreeFactory.BasicPSTFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
-import com.mjx.syntax.Grammer;
+import com.mjx.syntax.CNF;
+import com.mjx.syntax.PennCFG;
 import com.mjx.utils.PennTreeBankUtil;
 
 import java.io.BufferedReader;
@@ -35,7 +36,7 @@ public class PeenTreeBankLoading {
     }
 
     public void loadBank() throws Exception {
-        Grammer grammer = new Grammer();
+        CNF grammer=new PennCFG();
         TreeBankStream treeBankStream = new PennTreeBankStream();
         int num = 0;
         for (int no = 1; no < 200; ++no) {

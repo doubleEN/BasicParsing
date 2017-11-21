@@ -4,12 +4,10 @@ import com.mjx.TreeFactory.BasicPSTFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.syntax.Grammer;
 import com.mjx.syntax.Rule;
 import junit.framework.TestCase;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 

@@ -14,13 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public class GrammerTest extends TestCase {
+public class PennCFGTest extends TestCase {
 
     //测试是否生成的指定CFG规则集
     public void testCFG() throws Exception {
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
         BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
-        Grammer grammer=new Grammer();
+        CNF grammer=new PennCFG();
         grammer.addCFGRules(basicPhraseStructureTree.generateRuleSet());
 
         //得到的CFG规则集合
@@ -45,7 +45,7 @@ public class GrammerTest extends TestCase {
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3))(D(. .)))";
 
         BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
-        Grammer grammer=new Grammer();
+        CNF grammer=new PennCFG();
         grammer.expandGrammer(basicPhraseStructureTree);
 
         grammer.convertToCNFs();
@@ -72,7 +72,7 @@ public class GrammerTest extends TestCase {
         //(A(B(C1 d1)(C2 d2)(C3 d3)))
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
         BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
-        Grammer grammer=new Grammer();
+        CNF grammer=new PennCFG();
         grammer.expandGrammer(basicPhraseStructureTree);
 
         assertEquals(5,grammer.getSizeOfNonterminals());
@@ -88,33 +88,4 @@ public class GrammerTest extends TestCase {
         assertTrue(grammer.isTerminal("d3"));
     }
 
-    /**
-     * unit productions 无法派生到词汇的情况
-     */
-    public void testBug()throws Exception{
-        TreeBankStream bankStream = new PennTreeBankStream();
-        Grammer grammer = new Grammer();
-        //加载PennTreeBank
-        for (int no = 1; no < 200; ++no) {
-            String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
-            bankStream.openTreeBank(treeBank, "utf-8", new BasicPSTFactory());
-            BasicPhraseStructureTree phraseStructureTree = null;
-            while ((phraseStructureTree = bankStream.readNextTree()) != null) {
-                grammer.expandGrammer(phraseStructureTree);
-            }
-        }
-
-        grammer.convertToCNFs();
-
-        Set<Rule> CNFSet = grammer.getCNFs();
-        boolean flag = false;
-        for (Rule rule : CNFSet) {
-            if (rule.getRHS().len() == 1 && grammer.isNonterminal(rule.getRHS().getValues()[0]) && !grammer.isTerminal(rule.getRHS().getValues()[0])) {
-                flag = true;
-            }
-        }
-
-        assertTrue(flag);
-
-    }
 }
