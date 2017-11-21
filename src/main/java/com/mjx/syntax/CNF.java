@@ -40,13 +40,13 @@ public abstract class CNF {
     /**
      * 由一棵短语结构树扩充上下文无关文法
      */
-    public void expandGrammer(BasicPhraseStructureTree basicPhraseStructureTree) {
+    public void expandGrammer(BasicPhraseStructureTree phraseStructureTree) {
         //添加CFG规则
-        this.addCFGRules(basicPhraseStructureTree.generateRuleSet());
+        this.addCFGRules(phraseStructureTree.generateRuleSet());
         //添加非终结符
-        this.addNonterminals(basicPhraseStructureTree.getNonterminals());
+        this.addNonterminals(phraseStructureTree.getNonterminals());
         //添加非终结符
-        this.addTerminals(basicPhraseStructureTree.getTerminals());
+        this.addTerminals(phraseStructureTree.getTerminals());
     }
 
     /**

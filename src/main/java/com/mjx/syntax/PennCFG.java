@@ -1,5 +1,7 @@
 package com.mjx.syntax;
 
+import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,7 +13,27 @@ public class PennCFG extends CNF {
      */
     private Map<Rule, Integer> CFGRules = new HashMap<Rule, Integer>();
 
+    private Map<Rule[], Integer> ruleChains = new HashMap<>();
+
     public PennCFG() {
+    }
+
+    @Override
+    public void expandGrammer(BasicPhraseStructureTree phraseStructureTree) {
+        super.expandGrammer(phraseStructureTree);
+        //在CFG中，保存来自短语结构树的unit productions规则链
+        this.addRuleChain(phraseStructureTree.getUnitProductionsChain());
+    }
+
+    private void addRuleChain(Map<Rule[], Integer> ruleChains) {
+        Set<Map.Entry<Rule[], Integer>> entries = new HashSet<>();
+        for (Map.Entry<Rule[], Integer> entry : entries) {
+            if (ruleChains.get(entry.getKey())==null) {
+                ruleChains.put(entry.getKey(), entry.getValue());
+            } else {
+                ruleChains.put(entry.getKey(), entry.getValue() + ruleChains.get(entry.getKey()));
+            }
+        }
     }
 
     @Override
