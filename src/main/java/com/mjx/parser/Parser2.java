@@ -27,7 +27,10 @@ public class Parser2 extends CKYParser {
         // 句子长度为13，跑到N.V.时，栈溢出
         BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Mr. Vinken is chairman of Elsevier N.V. . ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
-            System.out.println(phraseStructureTree);
+            System.out.println(phraseStructureTree.dictTree());
+            if (phraseStructureTree.convertCFGTree(pennCFG)){
+                System.out.println(phraseStructureTree.dictTree());
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.mjx.PhraseStructureTree;
 
+import com.mjx.syntax.CNF;
 import com.mjx.syntax.LHS;
 import com.mjx.syntax.RHS;
 import com.mjx.syntax.Rule;
@@ -8,6 +9,9 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 短语结构树，可重构
+ */
 public class BasicPhraseStructureTree {
 
     /**
@@ -42,7 +46,7 @@ public class BasicPhraseStructureTree {
      */
     public BasicPhraseStructureTree(Node root) {
         this();
-        this.root=root;
+        this.root = root;
     }
 
     /**
@@ -181,7 +185,7 @@ public class BasicPhraseStructureTree {
      * 设置根
      */
     public void setRoot(Node root) {
-        this.root=root;
+        this.root = root;
     }
 
     /**
@@ -228,11 +232,12 @@ public class BasicPhraseStructureTree {
 
     /**
      * 直接从树形上处理unit productions情况。直接处理PennTreeBank上的两种unit productions 情况：
-     *  1.A-->B-->[C D]
-     *  2.A-->B-->d
+     * 1.A-->B-->[C D]
+     * 2.A-->B-->d
+     *
      * @return 返回unit productions的链式结构
      */
-    public Map<Rule[],Integer> getUnitProductionsChain(){
+    public Map<Rule[], Integer> getUnitProductionsChain() {
         Map<Rule[], Integer> chain = new HashMap<>();
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.root);
@@ -240,30 +245,30 @@ public class BasicPhraseStructureTree {
             Node currNode = queue.poll();
             if (currNode.numChild() == 1 && currNode.children.get(0).numChild() > 1) {
                 // A-->B-->[C D ...]
-                Rule[] rules=new Rule[2];
+                Rule[] rules = new Rule[2];
                 rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
-                String[] _rhs=new String[currNode.children.get(0).numChild()];
-                for (int i=0;i<currNode.children.get(0).numChild();++i) {
+                String[] _rhs = new String[currNode.children.get(0).numChild()];
+                for (int i = 0; i < currNode.children.get(0).numChild(); ++i) {
                     _rhs[i] = currNode.children.get(0).children.get(i).value;
                 }
-                rules[1] = new Rule(currNode.children.get(0).value,_rhs);
-                Integer num=chain.get(rules);
-                if (num !=null) {
+                rules[1] = new Rule(currNode.children.get(0).value, _rhs);
+                Integer num = chain.get(rules);
+                if (num != null) {
                     ++num;
                 } else {
-                    num=1;
+                    num = 1;
                 }
                 chain.put(rules, num);
-            } else if (currNode.numChild() == 1 && currNode.children.get(0).numChild()==1) {
+            } else if (currNode.numChild() == 1 && currNode.children.get(0).numChild() == 1) {
                 //A-->B-->d
-                Rule[] rules=new Rule[2];
+                Rule[] rules = new Rule[2];
                 rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
-                rules[1] = new Rule(currNode.children.get(0).value,currNode.children.get(0).children.get(0).value);
-                Integer num=chain.get(rules);
-                if (num !=null) {
+                rules[1] = new Rule(currNode.children.get(0).value, currNode.children.get(0).children.get(0).value);
+                Integer num = chain.get(rules);
+                if (num != null) {
                     ++num;
                 } else {
-                    num=1;
+                    num = 1;
                 }
                 chain.put(rules, num);
             }
@@ -277,13 +282,13 @@ public class BasicPhraseStructureTree {
     /**
      * 扫描是否包含unit productions
      */
-    public String  hasUnitProductions() {
+    public String hasUnitProductions() {
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.root);
         while (!queue.isEmpty()) {
             Node currNode = queue.poll();
-            if (currNode.numChild()==1&&!currNode.children.get(0).isLeaf()) {
-                return currNode.value + "-->" + currNode.children.get(0).value+"-->"+currNode.children.get(0).children;
+            if (currNode.numChild() == 1 && !currNode.children.get(0).isLeaf()) {
+                return currNode.value + "-->" + currNode.children.get(0).value + "-->" + currNode.children.get(0).children;
             }
             for (Node node : currNode.children) {
                 queue.offer(node);
@@ -300,8 +305,8 @@ public class BasicPhraseStructureTree {
         queue.offer(this.root);
         while (!queue.isEmpty()) {
             Node currNode = queue.poll();
-            if (currNode.numChild()==1&&currNode.children.get(0).numChild()==1&&currNode.children.get(0).children.get(0).isLeaf()) {
-                return currNode.value+"-->"+currNode.children.get(0).value+"-->"+currNode.children.get(0).children.get(0).value;
+            if (currNode.numChild() == 1 && currNode.children.get(0).numChild() == 1 && currNode.children.get(0).children.get(0).isLeaf()) {
+                return currNode.value + "-->" + currNode.children.get(0).value + "-->" + currNode.children.get(0).children.get(0).value;
             }
             for (Node node : currNode.children) {
                 queue.offer(node);
@@ -346,7 +351,6 @@ public class BasicPhraseStructureTree {
         return matcher.find();
     }
 
-
     @Override
     public String toString() {
         return this.root.toString();
@@ -356,25 +360,25 @@ public class BasicPhraseStructureTree {
      * 先序遍历
      */
     public String dictTree() {
-        int depth=0;
-        return this.partTree(root,depth);
+        int depth = 0;
+        return this.partTree(root, depth);
     }
 
-    private String partTree(Node node,int depth){
+    private String partTree(Node node, int depth) {
         if (node.isLeaf()) {
-            return "\""+node.value+"\"";
+            return "\"" + node.value + "\"";
         }
-        String subStr="{\""+node.value+"\":{";
-        for (int i=0;i< node.children.size();++i) {
+        String subStr = "{\"" + node.value + "\":{";
+        for (int i = 0; i < node.children.size(); ++i) {
             if (i == node.children.size() - 1) {
                 depth++;
-                subStr+="\"--"+depth+"\":"+this.partTree(node.children.get(i),depth)+"}";
+                subStr += "\"--" + depth + "\":" + this.partTree(node.children.get(i), depth) + "}";
             } else {
                 depth++;
-                subStr+="\"--"+depth+"\":"+this.partTree(node.children.get(i),depth)+",";
+                subStr += "\"--" + depth + "\":" + this.partTree(node.children.get(i), depth) + ",";
             }
         }
-        return subStr+"}";
+        return subStr + "}";
     }
 
     public static class Node {
@@ -448,12 +452,6 @@ public class BasicPhraseStructureTree {
             this.parent = father;
         }
 
-        /**
-         * 连接父节点
-         */
-        public void setParent(String father) {
-            this.parent = new Node(father);
-        }
 
         /**
          * 获得当前节点的值
@@ -523,6 +521,21 @@ public class BasicPhraseStructureTree {
                 return treeStr;
             }
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) {
+                return false;
+            }
+            if (obj == this) {
+                return true;
+            }
+            if (!(obj instanceof Node)) {
+                return false;
+            }
+            Node n = (Node) obj;
+            return this.value.equals(n.value);
+        }
     }
 
     /**
@@ -572,5 +585,105 @@ public class BasicPhraseStructureTree {
             }
         }
         return childStr + ")";
+    }
+
+    /**
+     * 将一颗短语结构树转化为符合正则文法的树
+     */
+    public boolean convertCFGTree(CNF grammer) {
+        String treeStr=this.toString();
+        //首先还原longRHS
+        this.restoreLongRHS();
+        //然后还原unit productions
+        this.restoreUnitProductions(grammer);
+
+        return !this.toString().equals(treeStr);
+    }
+
+    private void restoreLongRHS() {
+        while (this.linkRHS(this.root)) {}
+    }
+
+    private boolean linkRHS(Node node) {
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            if (currNode.value.length() > 3 && currNode.value.substring(0, 4).equals("rule")) {
+                //新构造的短语结构符成为了树根。问题可能存在于cutLong时，在新的空间构造新规则集，没有考虑原CFG中 A-->BC 的存在，而是构造了rulex-->BC
+                //但是，在CNF是存在A-->BC这条规则的，所以，判定这棵正则文法树不存在相应的上下文无关文法树。
+                if (currNode.isRoot()) {
+//                    System.out.println("这棵正则文法树不存在相应的上下文无关文法树。");
+                    return false;
+                }
+                Node parent = currNode.parent;
+                List<Node> children = currNode.children;
+                List<Node> parent_childen = parent.children;
+
+                parent.children = new ArrayList<>();
+                //先将currNode的孩子拼接到父节点上
+                for (Node child1 : children) {
+                    parent.addChild(child1);
+                    child1.setParent(parent);
+                }
+                //再将原父节点的孩子拼接到父节点右侧
+                for (Node child2 : parent_childen) {
+                    if (!child2.equals(currNode)) {
+                        parent.addChild(child2);
+                        child2.setParent(parent);
+                    }
+                }
+                return true;
+            }
+            List<Node> children = currNode.children;
+            for (Node child : children) {
+                queue.offer(child);
+            }
+        }
+        return false;
+    }
+
+    private void restoreUnitProductions(CNF grammer) {
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            String[] children = new String[currNode.children.size()];
+            for (int i = 0; i < currNode.children.size(); ++i) {
+                children[i] = currNode.children.get(i).value;
+            }
+            Rule unitProductionsRule = grammer.getUnitProductions(new Rule(currNode.value, children));
+            if (unitProductionsRule != null) {
+                Node unitNode = new Node(unitProductionsRule.getRHS().getValues()[0]);
+                if (unitProductionsRule.getRHS().len() == 1) {
+                    //还原A-->B-->d，处理到了叶子，不进行栈处理
+                    Node lexicon = currNode.children.get(0);
+                    unitNode.addChild(lexicon);
+                    lexicon.setParent(unitNode);
+
+                    currNode.children = new ArrayList<>();
+                    currNode.addChild(unitNode);
+                    unitNode.setParent(currNode);
+                } else {
+                    //还原A-->B-->CD..。这种unit productions的结构恢复要另外验证
+                    Node[] symbols = currNode.getChildren();
+                    unitNode.addChildren(symbols);
+
+                    //要将原本的孩子断开
+                    for (Node child : symbols) {
+                        child.setParent(unitNode);
+                        queue.offer(child);//孩子节点进栈
+                    }
+                    currNode.children = new ArrayList<>();
+                    currNode.addChild(unitNode);
+                    unitNode.setParent(currNode);
+                }
+            } else {
+                for (Node child : currNode.children) {
+                    queue.offer(child);
+                }
+            }
+
+        }
     }
 }

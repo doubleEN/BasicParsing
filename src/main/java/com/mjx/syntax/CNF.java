@@ -31,7 +31,7 @@ public abstract class CNF {
      */
     private Set<String> terminals = new HashSet<>();
 
-    public void constructCNF(){
+    protected void constructCNF() {
         this.rules = new HashMap<>();
         this.ltr = new HashMap<>();
         this.rtl = new HashMap<>();
@@ -61,7 +61,7 @@ public abstract class CNF {
     /**
      * 添加单个CFG规则
      */
-    public abstract void addCFGRule(Rule rule) ;
+    public abstract void addCFGRule(Rule rule);
 
     /**
      * 添加非终结符
@@ -88,7 +88,7 @@ public abstract class CNF {
     /**
      * CFG转CNF,long RHS 和unit productions分开转，直接在集合上操作，没有考虑频数
      */
-    public abstract void convertToCNFs() ;
+    public abstract void convertToCNFs();
 
     /**
      * 添加单个CNF规则,同时添加映射关系
@@ -172,7 +172,7 @@ public abstract class CNF {
     /**
      * 获得CFG规则集
      */
-    public abstract Set<Rule> getCFGs() ;
+    public abstract Set<Rule> getCFGs();
 
     /**
      * 获得CFG规则集
@@ -230,16 +230,22 @@ public abstract class CNF {
     }
 
 
-    public Set<LHS> searchLHS(String... RHS) {
-        if (RHS.length == 1) {
-            return this.rtl.get(new RHS(RHS[0]));
+    public Set<LHS> searchLHS(String... rhs) {
+        if (rhs.length == 1) {
+            return this.rtl.get(new RHS(rhs[0]));
         }
-        if (RHS.length == 2) {
-            return this.rtl.get(new RHS(RHS[0], RHS[1]));
+        if (rhs.length == 2) {
+            return this.rtl.get(new RHS(rhs[0], rhs[1]));
         } else {
             throw new IllegalArgumentException("正则文法的RHS长度为1或2.");
         }
     }
+
+    public Set<RHS> searchRHS(String lhs) {
+        return this.ltr.get(new LHS(lhs));
+    }
+
+    public abstract Rule getUnitProductions(Rule rule);
 
     /**
      * 是否包含CFG规则

@@ -28,7 +28,7 @@ public class Parser1 extends CKYParser{
 
         BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Mr./NNP Vinken/NNP is/VBZ chairman/NN of/IN Elsevier/NNP N.V./NNP ./. ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
-            System.out.println(phraseStructureTree.toString());
+            System.out.println(phraseStructureTree.dictTree());
         }
     }
 

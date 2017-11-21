@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class PSTCollins1 extends BasicPhraseStructureTree{
+public class PSTCollins1 extends PSTPennTreeBank{
 
     public PSTCollins1(String treeStr){
         this.generateTree(treeStr);

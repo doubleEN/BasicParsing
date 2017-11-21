@@ -12,6 +12,8 @@ public class PennCFG extends CNF {
 
     private Map<Rule[], Integer> ruleChains = new HashMap<>();
 
+    private Map<Rule, Rule> ruleToRule;
+
     public PennCFG() {
     }
 
@@ -70,6 +72,7 @@ public class PennCFG extends CNF {
     @Override
     public void convertToCNFs() {
         this.constructCNF();
+        this.ruleToRule = new HashMap<>();
 
         Map<Rule, Integer> tempRules = new HashMap<>();
         tempRules.putAll(this.CFGRules);
@@ -80,9 +83,9 @@ public class PennCFG extends CNF {
             Map.Entry<Rule[], Integer> chain = iter1.next();
             Rule rule1 = chain.getKey()[0];
             Rule rule2 = chain.getKey()[1];
+            Rule newRule = new Rule(rule1.getLHS(), rule2.getRHS());
             if (rule2.lenOfRHS() > 1) {
                 //A-->B-->CDE..转化为A-->CDE..，放入tempRules，以便对long RHS进行处理
-                Rule newRule = new Rule(rule1.getLHS(), rule2.getRHS());
                 Integer num = tempRules.get(newRule);
                 if (num == null) {
                     tempRules.put(newRule, chain.getValue());
@@ -90,15 +93,16 @@ public class PennCFG extends CNF {
                     tempRules.put(newRule, chain.getValue() + num);
                 }
                 //删除处理完的unit productions，可能重复删除
+                this.ruleToRule.put(newRule, rule1);
                 tempRules.remove(rule1);
                 tempRules.remove(rule2);
             } else if (rule2.lenOfRHS() == 1) {
                 //A-->B-->d转化为A-->d
-                Rule newRule = new Rule(rule1.getLHS(), rule2.getRHS());
                 // 1.一般的unit productions处理后加入CNF
                 this.addCNFRule(newRule);
+                this.ruleToRule.put(newRule, rule1);
                 tempRules.remove(rule1);
-                tempRules.remove(rule2);
+                tempRules.remove(rule2);//直接删除词性规则，是否欠考虑
             }
         }
 
@@ -180,5 +184,10 @@ public class PennCFG extends CNF {
                 newLHS = currLHS.getValue();
             }
         }
+    }
+
+    @Override
+    public Rule getUnitProductions(Rule rule) {
+        return this.ruleToRule.get(rule);
     }
 }
