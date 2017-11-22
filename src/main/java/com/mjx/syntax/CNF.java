@@ -263,4 +263,33 @@ public abstract class CNF {
     public void setLtr(Map<LHS, Set<RHS>> ltr) {
         this.ltr = ltr;
     }
+
+    /**
+     * 格式化打印当前文法集内容
+     */
+    public String printGrammer(){
+        String content = "< The Grammer of "+this.getClass().getName()+"> extends "+this.getClass().getSuperclass().getName()+"\n\n>>>[Non_Terminal]\n";
+        //非终结符
+        String[] nonT = this.nonterminals.toArray(new String[]{});
+        Arrays.sort(nonT);
+        content += Arrays.toString(nonT).substring(1,this.nonterminals.size()-1)+"\n";
+        content+="\n>>>[Terminal]\n";
+        //终结符
+        String[] t = this.terminals.toArray(new String[]{});
+        Arrays.sort(t);
+        content += Arrays.toString(t).substring(1,this.terminals.size()-1)+"\n";
+        //正则文法规则
+        content+="\n>>>[CNF_Rules]\n";
+        Set<Map.Entry<Rule, Integer>> entries = this.rules.entrySet();
+        String[] rules = new String[this.rules.size()];
+        int i=0;
+        for (Map.Entry<Rule, Integer> entry : entries) {
+            rules[i] = entry.getKey().toString();
+            ++i;
+        }
+        Arrays.sort(rules);
+        String ruleStr=Arrays.toString(rules);
+        content += ruleStr.substring(1,ruleStr.length()-1).replaceAll("],","]\n")+"\n";
+        return content;
+    }
 }

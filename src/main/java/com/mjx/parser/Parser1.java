@@ -8,6 +8,9 @@ import com.mjx.syntax.CNF;
 import com.mjx.syntax.PennCFG;
 import com.mjx.utils.PennTreeBankUtil;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 public class Parser1 extends CKYParser{
     public static void main(String[] args) throws Exception {
         TreeBankStream bankStream = new PennTreeBankStream();
@@ -18,17 +21,26 @@ public class Parser1 extends CKYParser{
             bankStream.openTreeBank(treeBank, "utf-8", new PSTPennTreeBankFactory());
             BasicPhraseStructureTree phraseStructureTree = null;
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
+//                if (phraseStructureTree.hasNode("FRAG-4")){
+//                    System.out.println(phraseStructureTree.dictTree());
+//                    System.out.println(treeBank);
+//                }
                 pennCFG.expandGrammer(phraseStructureTree);
             }
         }
 
         pennCFG.convertToCNFs();
+//        System.out.println(pennCFG.printGrammer());
+
+//        BufferedWriter bw = new BufferedWriter(new FileWriter("/home/jx_m/桌面/无标题文档"));
+//        bw.write(pennCFG.printGrammer());
+//        bw.flush();
 
         CKYParser ckyParser = new Parser1(pennCFG);
 
         BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Mr./NNP Vinken/NNP is/VBZ chairman/NN of/IN Elsevier/NNP N.V./NNP ./. ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
-            System.out.println(phraseStructureTree.dictTree());
+            System.out.println(phraseStructureTree);
         }
     }
 

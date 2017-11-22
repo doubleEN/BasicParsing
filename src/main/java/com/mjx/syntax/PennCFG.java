@@ -190,4 +190,20 @@ public class PennCFG extends CNF {
     public Rule getUnitProductions(Rule rule) {
         return this.ruleToRule.get(rule);
     }
+
+    @Override //particular
+    public String printGrammer() {
+        String content = super.printGrammer()+"\nParticular Content of "+this.getClass().getName()+"\n\n>>>[PennCFG_Rules]\n";
+        Set<Map.Entry<Rule, Integer>> entries = this.CFGRules.entrySet();
+        String[] rules = new String[this.CFGRules.size()];
+        int i=0;
+        for (Map.Entry<Rule, Integer> entry : entries) {
+            rules[i] = entry.getKey().toString();
+            ++i;
+        }
+        Arrays.sort(rules);
+        String ruleStr=Arrays.toString(rules);
+        content += ruleStr.substring(1,ruleStr.length()-1).replaceAll("],","]\n");
+        return content;
+    }
 }
