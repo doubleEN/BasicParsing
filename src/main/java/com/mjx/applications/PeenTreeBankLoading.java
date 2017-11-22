@@ -1,7 +1,7 @@
 package com.mjx.applications;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.TreeFactory.BasicPSTFactory;
+import com.mjx.TreeFactory.PSTPennTreeBankFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
 import com.mjx.syntax.CNF;
@@ -53,7 +53,7 @@ public class PeenTreeBankLoading {
                 }
             }
 
-            treeBankStream.openTreeBank(treeBank, "utf-8", new BasicPSTFactory());
+            treeBankStream.openTreeBank(treeBank, "utf-8", new PSTPennTreeBankFactory());
             BasicPhraseStructureTree basicPhraseStructureTree = null;
             while ((basicPhraseStructureTree = treeBankStream.readNextTree()) != null) {
                 grammer.expandGrammer(basicPhraseStructureTree);

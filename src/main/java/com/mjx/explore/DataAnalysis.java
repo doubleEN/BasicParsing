@@ -1,7 +1,7 @@
 package com.mjx.explore;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.TreeFactory.BasicPSTFactory;
+import com.mjx.TreeFactory.PSTPennTreeBankFactory;
 import com.mjx.TreeFactory.TreeFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
@@ -20,7 +20,7 @@ public class DataAnalysis {
         //加载PennTreeBank
         for (int no = 1; no < 200; ++no) {
             String treeBank = "C:\\Users\\2en\\Desktop\\treebank\\combined\\wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
-            analysis.loadBank(treeBank, "utf-8", new BasicPSTFactory());
+            analysis.loadBank(treeBank, "utf-8", new PSTPennTreeBankFactory());
         }
         analysis.convertCNF();
         //统计数据情况

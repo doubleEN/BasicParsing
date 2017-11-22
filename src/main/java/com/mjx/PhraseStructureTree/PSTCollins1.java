@@ -7,7 +7,7 @@ import java.util.Stack;
 public class PSTCollins1 extends PSTPennTreeBank{
 
     public PSTCollins1(String treeStr){
-        this.generateTree(treeStr);
+        super(treeStr);
     }
 
     @Override

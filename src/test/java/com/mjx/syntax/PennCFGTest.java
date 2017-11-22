@@ -1,25 +1,15 @@
 package com.mjx.syntax;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.TreeFactory.BasicPSTFactory;
-import com.mjx.TreeLoad.PennTreeBankStream;
-import com.mjx.TreeLoad.TreeBankStream;
-import com.mjx.parser.CKYParser;
-import com.mjx.parser.Parser1;
-import com.mjx.utils.PennTreeBankUtil;
-import javafx.scene.effect.SepiaTone;
+import com.mjx.PhraseStructureTree.PSTPennTreeBank;
 import junit.framework.TestCase;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
 
 public class PennCFGTest extends TestCase {
 
     //测试是否生成的指定CFG规则集
     public void testCFG() throws Exception {
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
-        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
+        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeStr);
         CNF grammer=new PennCFG();
         grammer.addCFGRules(basicPhraseStructureTree.generateRuleSet());
 
@@ -44,7 +34,7 @@ public class PennCFGTest extends TestCase {
     public void testCNF() throws Exception {
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3))(D(. .)))";
 
-        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
+        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeStr);
         CNF grammer=new PennCFG();
         grammer.expandGrammer(basicPhraseStructureTree);
 
@@ -58,7 +48,7 @@ public class PennCFGTest extends TestCase {
         Rule D_ = new Rule("D", ".");
         Rule _to_ = new Rule(".", ".");
 
-        assertEquals(8,grammer.getSizeOfCNF());//CNF集的大小
+        assertEquals(7,grammer.getSizeOfCNF());//CNF集的大小
 
         assertTrue(grammer.containCNFRule(rule0_C1C2));
         assertTrue(grammer.containCNFRule(B_rule0C3));
@@ -71,7 +61,7 @@ public class PennCFGTest extends TestCase {
     public void testSymbols(){
         //(A(B(C1 d1)(C2 d2)(C3 d3)))
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
-        BasicPhraseStructureTree basicPhraseStructureTree = new BasicPhraseStructureTree(treeStr);
+        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeStr);
         CNF grammer=new PennCFG();
         grammer.expandGrammer(basicPhraseStructureTree);
 

@@ -1,6 +1,7 @@
 package com.mjx.parser;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.PhraseStructureTree.PSTPennTreeBank;
 import com.mjx.syntax.CNF;
 import com.mjx.syntax.LHS;
 
@@ -174,7 +175,7 @@ public abstract class CKYParser {
         BasicPhraseStructureTree[] phraseStructureTrees = new BasicPhraseStructureTree[treeNum];
         for (int i = 0; i < treeNum; ++i) {
             BasicPhraseStructureTree.Node root = this.buildSubTree(this.parseTable.length - 1, 0, i);
-            phraseStructureTrees[i] = new BasicPhraseStructureTree(root);
+            phraseStructureTrees[i] = new PSTPennTreeBank(root);
             count = 0;
         }
         return phraseStructureTrees;

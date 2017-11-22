@@ -1,7 +1,7 @@
 package com.mjx.parser;
 
 import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.TreeFactory.BasicPSTFactory;
+import com.mjx.TreeFactory.PSTPennTreeBankFactory;
 import com.mjx.TreeLoad.PennTreeBankStream;
 import com.mjx.TreeLoad.TreeBankStream;
 import com.mjx.syntax.CNF;
@@ -16,7 +16,7 @@ public class Parser2 extends CKYParser {
         //加载PennTreeBank
         for (int no = 1; no < 200; ++no) {
             String treeBank = "/home/jx_m/桌面/NLparsing/treebank/combined/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
-            bankStream.openTreeBank(treeBank, "utf-8", new BasicPSTFactory());
+            bankStream.openTreeBank(treeBank, "utf-8", new PSTPennTreeBankFactory());
             BasicPhraseStructureTree phraseStructureTree = null;
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
                 pennCFG.expandGrammer(phraseStructureTree);
