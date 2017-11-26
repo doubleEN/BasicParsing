@@ -1,5 +1,10 @@
 package com.mjx.utils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Properties;
+
 public class PennTreeBankUtil {
 
     /**
@@ -13,5 +18,16 @@ public class PennTreeBankUtil {
         } else {
             return "0" + number;
         }
+    }
+
+    /**
+     * 加载属性文件PennTreeBankPath.propertiesz指定的树库combined路径
+     */
+    public static String getCombinedPath() throws IOException {
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("com/mjx/utils/PennTreeBankPath.properties");
+        Properties properties = new Properties();
+        InputStreamReader isr = new InputStreamReader(inputStream, "utf-8");
+        properties.load(isr);
+        return (String) properties.get("combined");
     }
 }

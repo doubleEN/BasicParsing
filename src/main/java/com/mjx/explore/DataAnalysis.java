@@ -19,7 +19,7 @@ public class DataAnalysis {
         DataAnalysis analysis = new DataAnalysis(new PennTreeBankStream());
         //加载PennTreeBank
         for (int no = 1; no < 200; ++no) {
-            String treeBank = "C:\\Users\\2en\\Desktop\\treebank\\combined\\wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
+            String treeBank = PennTreeBankUtil.getCombinedPath()+"/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
             analysis.loadBank(treeBank, "utf-8", new PSTPennTreeBankFactory());
         }
         analysis.convertCNF();
