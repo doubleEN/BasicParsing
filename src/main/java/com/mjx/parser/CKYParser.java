@@ -100,7 +100,6 @@ public abstract class CKYParser {
 
         //遍历矩阵每行
         for (int row = 0; row < wordLen; ++row) {
-            System.out.println("解析到词："+this.words[row]);
             String[] singleLHSs = null;
             //首先填充词汇的LHS
             if (this.tags == null) {
@@ -117,7 +116,7 @@ public abstract class CKYParser {
             this.parseTable[row][this.parseTable[row].length - 1] = singleLHSs;
             //toolTable的相应位置为null，以便终结判断（本身就为null，声明以便阅读）
             this.toolTable[row][this.toolTable[row].length - 1] = null;
-
+            System.out.println("单元格_[row:"+row+",col:"+(this.parseTable[row].length-1)+"] 放入："+Arrays.toString(this.parseTable[row][this.parseTable[row].length-1]));
             //从解析数组当前行的倒数第二格沿这行向前解析
             for (int col = this.parseTable[row].length - 2; col >= 0; --col) {
                 //当前格可能的LHS
@@ -159,6 +158,7 @@ public abstract class CKYParser {
                         this.toolTable[row][col][s.getKey()[0]] = new int[]{s.getKey()[1], s.getKey()[2], s.getKey()[3], s.getKey()[4], s.getKey()[5], s.getKey()[6]};
                     }
                 }
+                System.out.println("单元格_[row:"+row+",col:"+col+"] 放入："+Arrays.toString(this.parseTable[row][col]));
             }
         }
 
