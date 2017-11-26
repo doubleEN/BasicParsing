@@ -1,8 +1,7 @@
-package com.mjx.TreeFactory;
+package com.mjx.treefactory;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.PhraseStructureTree.PSTPennTreeBank;
-import sun.reflect.generics.tree.Tree;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
+import com.mjx.phrasestructuretree.PSTPennTreeBank;
 
 public class PSTPennTreeBankFactory implements TreeFactory {
 

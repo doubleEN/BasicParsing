@@ -1,4 +1,4 @@
-package com.mjx.PhraseStructureTree;
+package com.mjx.phrasestructuretree;
 
 import com.mjx.syntax.CNF;
 import com.mjx.syntax.LHS;

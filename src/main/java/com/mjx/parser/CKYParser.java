@@ -1,7 +1,7 @@
 package com.mjx.parser;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.PhraseStructureTree.PSTPennTreeBank;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
+import com.mjx.phrasestructuretree.PSTPennTreeBank;
 import com.mjx.syntax.CNF;
 import com.mjx.syntax.LHS;
 

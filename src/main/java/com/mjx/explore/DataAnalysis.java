@@ -1,10 +1,10 @@
 package com.mjx.explore;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.TreeFactory.PSTPennTreeBankFactory;
-import com.mjx.TreeFactory.TreeFactory;
-import com.mjx.TreeLoad.PennTreeBankStream;
-import com.mjx.TreeLoad.TreeBankStream;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
+import com.mjx.treefactory.PSTPennTreeBankFactory;
+import com.mjx.treefactory.TreeFactory;
+import com.mjx.treeload.PennTreeBankStream;
+import com.mjx.treeload.TreeBankStream;
 import com.mjx.syntax.CNF;
 import com.mjx.syntax.PennCFG;
 import com.mjx.syntax.Rule;

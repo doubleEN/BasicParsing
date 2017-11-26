@@ -1,7 +1,7 @@
-package com.mjx.TreeLoad;
+package com.mjx.treeload;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.TreeFactory.TreeFactory;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
+import com.mjx.treefactory.TreeFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

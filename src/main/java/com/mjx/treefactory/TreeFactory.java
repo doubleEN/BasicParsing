@@ -1,6 +1,6 @@
-package com.mjx.TreeFactory;
+package com.mjx.treefactory;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
 
 public interface TreeFactory {
     BasicPhraseStructureTree createStructureTree(String treeStr);

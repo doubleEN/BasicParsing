@@ -1,7 +1,7 @@
 package com.mjx.syntax;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.PhraseStructureTree.PSTPennTreeBank;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
+import com.mjx.phrasestructuretree.PSTPennTreeBank;
 import junit.framework.TestCase;
 
 public class PennCFGTest extends TestCase {

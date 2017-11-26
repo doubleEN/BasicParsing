@@ -1,7 +1,7 @@
-package com.mjx.TreeFactory;
+package com.mjx.treefactory;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
-import com.mjx.PhraseStructureTree.PSTCollins1;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
+import com.mjx.phrasestructuretree.PSTCollins1;
 
 public class PSTCollins1Factory implements TreeFactory{
 

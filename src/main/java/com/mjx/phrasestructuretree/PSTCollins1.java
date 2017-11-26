@@ -1,4 +1,4 @@
-package com.mjx.PhraseStructureTree;
+package com.mjx.phrasestructuretree;
 
 import java.util.ArrayList;
 import java.util.List;

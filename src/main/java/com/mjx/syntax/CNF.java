@@ -1,6 +1,6 @@
 package com.mjx.syntax;
 
-import com.mjx.PhraseStructureTree.BasicPhraseStructureTree;
+import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
 
 import java.util.*;
 
