@@ -6,7 +6,7 @@ import com.mjx.syntax.Rule;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class PSTPennTreeBank extends BasicPhraseStructureTree{
+public class PSTPennTreeBank extends BasicPhraseStructureTree {
 
 
     /**
@@ -28,9 +28,12 @@ public class PSTPennTreeBank extends BasicPhraseStructureTree{
      * 将一颗短语结构树转化为符合正则文法的树(重构)
      */
     public boolean convertCFGTree(CNF grammer) {
-        String treeStr=this.toString();
+        String treeStr = this.toString();
         //首先还原longRHS
         this.restoreLongRHS();
+        if (this.getRoot() == null) {
+            return true;
+        }
         //然后还原unit productions
         this.restoreUnitProductions(grammer);
 
@@ -38,7 +41,8 @@ public class PSTPennTreeBank extends BasicPhraseStructureTree{
     }
 
     private void restoreLongRHS() {
-        while (this.linkRHS(this.getRoot())) {}
+        while (this.linkRHS(this.getRoot())) {
+        }
     }
 
     private boolean linkRHS(Node node) {
@@ -51,6 +55,7 @@ public class PSTPennTreeBank extends BasicPhraseStructureTree{
                 //但是，在CNF是存在A-->BC这条规则的，所以，判定这棵正则文法树不存在相应的上下文无关文法树。
                 if (currNode.isRoot()) {
 //                    System.out.println("这棵正则文法树不存在相应的上下文无关文法树。");
+                    this.setRoot(null);
                     return false;
                 }
                 Node parent = currNode.getParent();

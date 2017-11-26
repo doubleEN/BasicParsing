@@ -8,10 +8,8 @@ import com.mjx.syntax.CNF;
 import com.mjx.syntax.PennCFG;
 import com.mjx.utils.PennTreeBankUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+public class Parser1 extends CKYParser {
 
-public class Parser1 extends CKYParser{
     public static void main(String[] args) throws Exception {
         TreeBankStream bankStream = new PennTreeBankStream();
         CNF pennCFG = new PennCFG();
@@ -21,27 +19,22 @@ public class Parser1 extends CKYParser{
             bankStream.openTreeBank(treeBank, "utf-8", new PSTPennTreeBankFactory());
             BasicPhraseStructureTree phraseStructureTree = null;
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
-//                if (phraseStructureTree.hasNode("FRAG-4")){
-//                    System.out.println(phraseStructureTree.dictTree());
-//                    System.out.println(treeBank);
-//                }
                 pennCFG.expandGrammer(phraseStructureTree);
+                if (phraseStructureTree.toString().indexOf("(JJ anti-takeover)(NN plan)")>0){
+                    System.out.println("目标树："+phraseStructureTree);
+                    //(S(NP-SBJ(DT The)(NN company))(ADVP(RB also))(VP(VBD adopted)(NP(DT an)(JJ anti-takeover)(NN plan)))(. .))
+                }
             }
         }
-
         pennCFG.convertToCNFs();
-//        System.out.println(pennCFG.printGrammer());
-
-//        BufferedWriter bw = new BufferedWriter(new FileWriter("/home/jx_m/桌面/无标题文档"));
-//        bw.write(pennCFG.printGrammer());
-//        bw.flush();
-
         CKYParser ckyParser = new Parser1(pennCFG);
-
-        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Mr./NNP Vinken/NNP is/VBZ chairman/NN of/IN Elsevier/NNP N.V./NNP ./. ");
+        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("The company also adopted an anti-takeover plan .");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
-            System.out.println(phraseStructureTree);
+            if (phraseStructureTree.convertCFGTree(pennCFG)&&phraseStructureTree.getRoot()!=null){
+                System.out.println(phraseStructureTree);
+            }
         }
+        //穷举结果中，存在正确的树形。
     }
 
     public Parser1(CNF cnf) {
@@ -50,17 +43,8 @@ public class Parser1 extends CKYParser{
 
     @Override
     public void formatSentence(String sentence) {
-        String[] wts = sentence.trim().split("\\s+");
-        String[]words = new String[wts.length];
-        String[]tags = new String[wts.length];
-
-        for (int index = 0; index < wts.length; ++index) {
-            String[] wordTag = wts[index].split("/");
-            words[index] = wordTag[0];
-            tags[index] = wordTag[1];
-        }
-
-        this.setTags(tags);
+        String[] words = sentence.trim().split("\\s+");
+        this.setTags(null);
         this.setWords(words);
     }
 }
