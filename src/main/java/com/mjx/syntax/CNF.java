@@ -270,15 +270,20 @@ public abstract class CNF {
     public String printGrammer(){
         String content = "< The Grammer of "+this.getClass().getName()+"> extends "+this.getClass().getSuperclass().getName()+"\n\n>>>[Non_Terminal]\n";
         //非终结符
+        System.out.println("非终结符集大小："+this.nonterminals.size());
         String[] nonT = this.nonterminals.toArray(new String[]{});
         Arrays.sort(nonT);
-        content += Arrays.toString(nonT).substring(1,this.nonterminals.size()-1)+"\n";
+        String nonTStr=Arrays.toString(nonT);
+        content += nonTStr.substring(1,nonTStr.length()-1)+"\n";
         content+="\n>>>[Terminal]\n";
         //终结符
+        System.out.println("终结符集大小："+this.terminals.size());
         String[] t = this.terminals.toArray(new String[]{});
         Arrays.sort(t);
-        content += Arrays.toString(t).substring(1,this.terminals.size()-1)+"\n";
+        String tStr=Arrays.toString(t);
+        content += tStr.substring(1,tStr.length()-1)+"\n";
         //正则文法规则
+        System.out.println("CNF规则集大小："+this.rules.size());
         content+="\n>>>[CNF_Rules]\n";
         Set<Map.Entry<Rule, Integer>> entries = this.rules.entrySet();
         String[] rules = new String[this.rules.size()];

@@ -195,6 +195,7 @@ public class PennCFG extends CNF {
     public String printGrammer() {
         String content = super.printGrammer()+"\nParticular Content of "+this.getClass().getName()+"\n\n>>>[PennCFG_Rules]\n";
         Set<Map.Entry<Rule, Integer>> entries = this.CFGRules.entrySet();
+        System.out.println("CFG规则集大小："+this.CFGRules.size());
         String[] rules = new String[this.CFGRules.size()];
         int i=0;
         for (Map.Entry<Rule, Integer> entry : entries) {

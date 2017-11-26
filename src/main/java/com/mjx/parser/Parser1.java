@@ -8,6 +8,9 @@ import com.mjx.syntax.CNF;
 import com.mjx.syntax.PennCFG;
 import com.mjx.utils.PennTreeBankUtil;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 public class Parser1 extends CKYParser {
 
     public static void main(String[] args) throws Exception {
@@ -35,6 +38,10 @@ public class Parser1 extends CKYParser {
             }
         }
         //穷举结果中，存在正确的树形。
+
+        BufferedWriter bw=new BufferedWriter(new FileWriter("/home/jx_m/桌面/文法集"));
+        bw.write(pennCFG.printGrammer());
+        bw.close();
     }
 
     public Parser1(CNF cnf) {
