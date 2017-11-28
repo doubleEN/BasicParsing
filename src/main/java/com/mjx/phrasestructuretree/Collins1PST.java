@@ -6,12 +6,12 @@ import java.util.Stack;
 
 public class Collins1PST extends PennTreeBankPST {
 
-    public Collins1PST(String treeStr){
+    public Collins1PST(String treeStr) {
         super(treeStr);
     }
 
-    public Collins1PST(String treeStr,boolean removeNone){
-        super(treeStr,removeNone);
+    public Collins1PST(String treeStr, boolean removeNone) {
+        super(treeStr, removeNone);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class Collins1PST extends PennTreeBankPST {
     /**
      * 未完成。
      */
-    class LexicalNode extends BasicPhraseStructureTree.Node{
+    class LexicalNode extends BasicPhraseStructureTree.Node {
 
         /**
          * 当前非终止符的中心词

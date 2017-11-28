@@ -27,7 +27,7 @@ public abstract class BasicPhraseStructureTree {
     private Set<String> terminal = new HashSet<>();
 
     public BasicPhraseStructureTree() {
-//        System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
+        //System.out.println("构造短语结构树：" + this.getClass().getSimpleName());
     }
 
     /**
@@ -41,7 +41,7 @@ public abstract class BasicPhraseStructureTree {
     /**
      * 传入PhraseStructureTree能够处理的短语结构树括号表达式，根据removeNone处理NONE element
      */
-    public BasicPhraseStructureTree(String treeStr,boolean removeNone) {
+    public BasicPhraseStructureTree(String treeStr, boolean removeNone) {
         this(treeStr);
         if (removeNone) {
             this.processLexicon();
@@ -68,29 +68,27 @@ public abstract class BasicPhraseStructureTree {
             return null;
         }
         //获得孩子的方式重构
-        Iterator<Node> iter = node.children.iterator();
-        String[] lhs = new String[node.numChild()];
-        int num = 0;
-        while (iter.hasNext()) {
-            lhs[num] = iter.next().value;
-            ++num;
+        Node[] children = node.getChildren();
+        String[] _rhs = new String[children.length];
+        for (int i = 0; i < _rhs.length; ++i) {
+            _rhs[i] = children[i].getValue();
         }
-        Rule rule = new Rule(new LHS(node.value), new RHS(lhs));
-        return rule;
+        return new Rule(node.value, _rhs);
     }
 
     /**
      * 解析PhraseStructureTree得到相应规则集(树的层序遍历)
+     *
+     * @return 返回的是List，而不是Set，无概率的时候可以是Set
      */
     public List<Rule> generateRuleSet() {
-        //使用list而不是set，避免丢失同一个树中出现多次的规则
         List<Rule> ruleSet = new ArrayList<>();
         Queue<Node> queue = new LinkedList<>();
         queue.offer(root);
         while (!queue.isEmpty()) {
-            Iterator<Node> iter = queue.peek().children.iterator();
-            while (iter.hasNext()) {
-                queue.offer(iter.next());
+            Node[] children = queue.peek().getChildren();
+            for (Node child : children) {
+                queue.offer(child);
             }
             Node node = queue.poll();
             if (!node.isLeaf()) {
@@ -247,9 +245,10 @@ public abstract class BasicPhraseStructureTree {
 
     /**
      * 直接从树形上处理unit productions情况。
+     *
      * @return 返回unit productions的链式结构及其计数
      */
-    public abstract Map<RuleChain, Integer> getUnitProductionsChain() ;
+    public abstract Map<RuleChain, Integer> getUnitProductionsChain();
 
     /**
      * 扫描是否包含unit productions
@@ -329,13 +328,15 @@ public abstract class BasicPhraseStructureTree {
     }
 
     /**
-     * 先序遍历
+     * 先序遍历打印树的python的字典形式
      */
+    @Deprecated
     public String dictTree() {
         int depth = 0;
         return this.partTree(root, depth);
     }
 
+    @Deprecated
     private String partTree(Node node, int depth) {
         if (node.isLeaf()) {
             return "\"" + node.value + "\"";
@@ -408,11 +409,19 @@ public abstract class BasicPhraseStructureTree {
         return childStr + ")";
     }
 
+    /**
+     * 将一棵文法树，转换成上下文无关文法树
+     *
+     * @param grammer
+     * @return
+     */
     public abstract boolean convertCFGTree(CNF grammer);
 
 
+    /**
+     * 短语结构树的节点
+     */
     public static class Node {
-
 
         /**
          * 当前节点的符号
@@ -566,6 +575,7 @@ public abstract class BasicPhraseStructureTree {
                 return treeStr;
             }
         }
+
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {

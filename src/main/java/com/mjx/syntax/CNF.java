@@ -9,7 +9,7 @@ public abstract class CNF {
     /**
      * PennCFG,上下文无关文法规则集
      */
-    private Map<Rule, Integer> rules;
+    private Set<Rule> CNFRules;
 
     /**
      * CNF由右部派生左部的映射集
@@ -32,7 +32,7 @@ public abstract class CNF {
     private Set<String> terminals = new HashSet<>();
 
     protected void constructCNF() {
-        this.rules = new HashMap<>();
+        this.CNFRules = new HashSet<>();
         this.ltr = new HashMap<>();
         this.rtl = new HashMap<>();
     }
@@ -61,7 +61,7 @@ public abstract class CNF {
     /**
      * 添加单个CFG规则
      */
-    public abstract void addCFGRule(Rule rule);
+    public abstract boolean addCFGRule(Rule rule);
 
     /**
      * 添加非终结符
@@ -86,22 +86,16 @@ public abstract class CNF {
     }
 
     /**
-     * CFG转CNF,long RHS 和unit productions分开转，直接在集合上操作，没有考虑频数
+     * CFG转CNF,long RHS 和unit productions分开转，直接在集合上操作
      */
     public abstract void convertToCNFs();
 
     /**
      * 添加单个CNF规则,同时添加映射关系
      */
-    public Integer addCNFRule(Rule rule) {
-        Integer val = this.rules.get(rule);
-        if (val == null) {
-            val = 1;
-        } else {
-            ++val;
-        }
+    public boolean addCNFRule(Rule rule) {
         this.addCNFMapping(rule);//判断以后再决定是否增加映射关系
-        return this.rules.put(rule, val);
+        return this.CNFRules.add(rule);
     }
 
     /**
@@ -130,10 +124,10 @@ public abstract class CNF {
      * 正则文法集大小
      */
     public int getSizeOfCNF() {
-        if (this.rules == null) {
+        if (this.CNFRules == null) {
             return -1;
         }
-        return this.rules.size();
+        return this.CNFRules.size();
     }
 
     /**
@@ -145,7 +139,7 @@ public abstract class CNF {
      * 是否包含CNF规则
      */
     public boolean containCNFRule(Rule rule) {
-        return this.rules.containsKey(rule);
+        return this.CNFRules.contains(rule);
     }
 
     /**
@@ -178,15 +172,7 @@ public abstract class CNF {
      * 获得CFG规则集
      */
     public Set<Rule> getCNFs() {
-        if (this.rules == null) {
-            return null;
-        }
-        Set<Rule> rules = new HashSet<>();
-        Set<Map.Entry<Rule, Integer>> ruleSet = this.rules.entrySet();
-        for (Map.Entry<Rule, Integer> rule : ruleSet) {
-            rules.add(rule.getKey());
-        }
-        return rules;
+        return this.CNFRules;
     }
 
     /**
@@ -262,10 +248,6 @@ public abstract class CNF {
      */
     public abstract boolean containCFGRule(Rule rule);
 
-    public void setCNFRules(Map<Rule, Integer> rules) {
-        this.rules = rules;
-    }
-
     public void setRtl(Map<RHS, Set<LHS>> rtl) {
         this.rtl = rtl;
     }
@@ -293,13 +275,12 @@ public abstract class CNF {
         String tStr=Arrays.toString(t);
         content += tStr.substring(1,tStr.length()-1)+"\n";
         //正则文法规则
-        System.out.println("CNF规则集大小："+this.rules.size());
+        System.out.println("CNF规则集大小："+this.CNFRules.size());
         content+="\n>>>[CNF_Rules]\n";
-        Set<Map.Entry<Rule, Integer>> entries = this.rules.entrySet();
-        String[] rules = new String[this.rules.size()];
+        String[] rules = new String[this.CNFRules.size()];
         int i=0;
-        for (Map.Entry<Rule, Integer> entry : entries) {
-            rules[i] = entry.getKey().toString();
+        for (Rule r : this.CNFRules) {
+            rules[i] = r.toString();
             ++i;
         }
         Arrays.sort(rules);

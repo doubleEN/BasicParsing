@@ -18,8 +18,8 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
     /**
      * 传入PhraseStructureTree能够处理的短语结构树括号表达式
      */
-    public PennTreeBankPST(String treeStr,boolean removeNone) {
-        super(treeStr,removeNone);
+    public PennTreeBankPST(String treeStr, boolean removeNone) {
+        super(treeStr, removeNone);
     }
 
     /**

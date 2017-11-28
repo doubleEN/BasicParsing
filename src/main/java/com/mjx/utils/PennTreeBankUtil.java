@@ -21,10 +21,10 @@ public class PennTreeBankUtil {
     }
 
     /**
-     * 加载属性文件PennTreeBankPath.propertiesz指定的树库combined路径
+     * 加载属性文件PennTreeBankPath.propertiesz指定的树库combined路径，PennTreeBankPath.properties位于编译路径 BasicParsing/target/classes 下
      */
     public static String getCombinedPath() throws IOException {
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("com/mjx/utils/PennTreeBankPath.properties");
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream("PennTreeBankPath.properties");
         Properties properties = new Properties();
         InputStreamReader isr = new InputStreamReader(inputStream, "utf-8");
         properties.load(isr);

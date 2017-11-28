@@ -9,7 +9,7 @@ public class PennCFG extends CNF {
     /**
      * PennCFG,上下文无关文法规则集
      */
-    private Map<Rule, Integer> CFGRules = new HashMap<Rule, Integer>();
+    private Set<Rule> CFGRules = new HashSet<>();
 
     private Map<RuleChain, Integer> ruleChains = new HashMap<>();
 
@@ -44,14 +44,8 @@ public class PennCFG extends CNF {
     }
 
     @Override
-    public void addCFGRule(Rule rule) {
-        Integer val = this.CFGRules.get(rule);
-        if (val == null) {
-            val = 1;
-        } else {
-            ++val;
-        }
-        this.CFGRules.put(rule, val);
+    public boolean addCFGRule(Rule rule) {
+        return this.CFGRules.add(rule);
     }
 
     /**
@@ -64,17 +58,12 @@ public class PennCFG extends CNF {
 
     @Override
     public Set<Rule> getCFGs() {
-        Set<Rule> rules = new HashSet<>();
-        Set<Map.Entry<Rule, Integer>> ruleSet = this.CFGRules.entrySet();
-        for (Map.Entry<Rule, Integer> rule : ruleSet) {
-            rules.add(rule.getKey());
-        }
-        return rules;
+        return this.CFGRules;
     }
 
     @Override
     public boolean containCFGRule(Rule rule) {
-        return this.CFGRules.containsKey(rule);
+        return this.CFGRules.contains(rule);
     }
 
     @Override
@@ -82,8 +71,8 @@ public class PennCFG extends CNF {
         this.constructCNF();
         this.ruleChain = new HashMap<>();
 
-        Map<Rule, Integer> tempRules = new HashMap<>();
-        tempRules.putAll(this.CFGRules);
+        Set<Rule> tempRules = new HashSet<>();
+        tempRules.addAll(this.CFGRules);
 
         //处理unit productions,且在正则文法规则和long rhs之前处理，因为存在A-->B-->C D..，这样的语法
         Iterator<Map.Entry<RuleChain, Integer>> iter1 = this.ruleChains.entrySet().iterator();
@@ -92,12 +81,6 @@ public class PennCFG extends CNF {
             Rule newRule =chain.getKey().getEqualRule();
             if (newRule.lenOfRHS() > 1) {
                 //A-->B-->CDE..转化为A-->CDE..，放入tempRules，以便对long RHS进行处理
-                Integer num = tempRules.get(newRule);
-                if (num == null) {
-                    tempRules.put(newRule, chain.getValue());
-                } else {
-                    tempRules.put(newRule, chain.getValue() + num);
-                }
                 //删除处理完的unit productions，可能重复删除
                 Set<RuleChain> ruleSet = this.ruleChain.get(newRule);
                 if (ruleSet == null) {
@@ -115,7 +98,7 @@ public class PennCFG extends CNF {
                 this.addCNFRule(newRule);
                 Set<RuleChain> ruleSet = this.ruleChain.get(newRule);
                 if (ruleSet == null) {
-                    ruleSet = new HashSet<>();//使用TreeSet，而不是HashSet
+                    ruleSet = new HashSet<>();
                 }
                 ruleSet.add(chain.getKey());
                 this.addCNFRule(newRule);
@@ -127,10 +110,10 @@ public class PennCFG extends CNF {
             }
         }
 
-        Iterator<Map.Entry<Rule, Integer>> iter2 = tempRules.entrySet().iterator();
+        Iterator<Rule> iter2 = tempRules.iterator();
         //筛选CFG中存在的CNF规则
         while (iter2.hasNext()) {
-            Rule _rule = iter2.next().getKey();
+            Rule _rule = iter2.next();
             //Penn上，rhs长度为2的规则，一定属于正则文法
             if (_rule.lenOfRHS() == 2) {
                 // 2.CFG上正则文法规则加入CNF
@@ -146,15 +129,14 @@ public class PennCFG extends CNF {
         //开始处理longRHS，没有正确处理计数
         Map<RHS, LHS> newRules = new HashMap<>();
 
-        Iterator<Map.Entry<Rule, Integer>> iter3 = tempRules.entrySet().iterator();
+        Iterator<Rule> iter3 = tempRules.iterator();
 
         while (iter3.hasNext()) {
-            Map.Entry<Rule, Integer> entry = iter3.next();
-            if (entry.getKey().lenOfRHS() < 3) {
-                System.out.println(entry.getKey());
+            Rule rule = iter3.next();
+            if (rule.lenOfRHS() < 3) {
                 throw new IllegalArgumentException("存在RHS长度低于3的规则未处理完。");
             }
-            this.cutLongRHS(entry.getKey(), newRules);
+            this.cutLongRHS(rule, newRules);
         }
 
         Set<Map.Entry<RHS, LHS>> entries = newRules.entrySet();
@@ -216,12 +198,11 @@ public class PennCFG extends CNF {
     @Override
     public String printGrammer() {
         String content = super.printGrammer() + "\nParticular Content of " + this.getClass().getName() + "\n\n>>>[PennCFG_Rules]\n";
-        Set<Map.Entry<Rule, Integer>> entries = this.CFGRules.entrySet();
         System.out.println("CFG规则集大小：" + this.CFGRules.size());
         String[] rules = new String[this.CFGRules.size()];
         int i = 0;
-        for (Map.Entry<Rule, Integer> entry : entries) {
-            rules[i] = entry.getKey().toString();
+        for (Rule rule : this.CFGRules) {
+            rules[i] =rule.toString();
             ++i;
         }
         Arrays.sort(rules);
