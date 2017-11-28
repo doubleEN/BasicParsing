@@ -1,7 +1,7 @@
 package com.mjx.parser;
 
 import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
-import com.mjx.phrasestructuretree.PSTPennTreeBank;
+import com.mjx.phrasestructuretree.PennTreeBankPST;
 import com.mjx.syntax.CNF;
 import com.mjx.syntax.LHS;
 
@@ -175,7 +175,7 @@ public abstract class CKYParser {
         BasicPhraseStructureTree[] phraseStructureTrees = new BasicPhraseStructureTree[treeNum];
         for (int i = 0; i < treeNum; ++i) {
             BasicPhraseStructureTree.Node root = this.buildSubTree(this.parseTable.length - 1, 0, i);
-            phraseStructureTrees[i] = new PSTPennTreeBank(root);
+            phraseStructureTrees[i] = new PennTreeBankPST(root);
             count = 0;
         }
         return phraseStructureTrees;
@@ -214,7 +214,7 @@ public abstract class CKYParser {
     }
 
     /**
-     * 生文本的格式化方法
+     * 格式化输入的生句子
      */
     public abstract void formatSentence(String sentence);
 

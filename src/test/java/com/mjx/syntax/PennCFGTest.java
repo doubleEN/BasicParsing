@@ -1,7 +1,7 @@
 package com.mjx.syntax;
 
 import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
-import com.mjx.phrasestructuretree.PSTPennTreeBank;
+import com.mjx.phrasestructuretree.PennTreeBankPST;
 import junit.framework.TestCase;
 
 public class PennCFGTest extends TestCase {
@@ -9,7 +9,7 @@ public class PennCFGTest extends TestCase {
     //测试是否生成的指定CFG规则集
     public void testCFG() throws Exception {
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeStr);
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeStr);
         CNF grammer=new PennCFG();
         grammer.addCFGRules(basicPhraseStructureTree.generateRuleSet());
 
@@ -34,7 +34,7 @@ public class PennCFGTest extends TestCase {
     public void testCNF() throws Exception {
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3))(D(. .)))";
 
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeStr);
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeStr);
         CNF grammer=new PennCFG();
         grammer.expandGrammer(basicPhraseStructureTree);
 
@@ -61,7 +61,7 @@ public class PennCFGTest extends TestCase {
     public void testSymbols(){
         //(A(B(C1 d1)(C2 d2)(C3 d3)))
         String treeStr="(A(B(C1 d1)(C2 d2)(C3 d3)))";
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeStr);
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeStr);
         CNF grammer=new PennCFG();
         grammer.expandGrammer(basicPhraseStructureTree);
 

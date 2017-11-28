@@ -2,7 +2,7 @@ package com.mjx.parser;
 
 import com.mjx.syntax.CNF;
 
-public class Parser2 extends CKYParser{
+public class Parser2 extends CKYParser {
 
     public Parser2(CNF cnf) {
         super(cnf);
@@ -11,13 +11,27 @@ public class Parser2 extends CKYParser{
     @Override
     public void formatSentence(String sentence) {
         String[] wts = sentence.trim().split("\\s+");
-        String[]words = new String[wts.length];
-        String[]tags = new String[wts.length];
+        String[] words = new String[wts.length];
+        String[] tags = new String[wts.length];
 
-        for (int index = 0; index < wts.length; ++index) {
-            String[] wordTag = wts[index].split("/");
-            words[index] = wordTag[0];
-            tags[index] = wordTag[1];
+        for (int i = 0; i < wts.length; ++i) {
+            String[] wordTag = wts[i].split("/");
+
+            if (wordTag[0].equals("(")) {
+                words[i] = "-LRB-";
+                tags[i] = "-LRB-";
+            } else if (wordTag[0].equals(")")) {
+                words[i] = "-RRB-";
+                tags[i] = "-RRB-";
+            } else if (wordTag[0].equals("{")) {
+                words[i] = "-LCB-";
+                tags[i] = "-LRB-";
+            } else if (wordTag[0].equals("}")) {
+                words[i] = "-RCB-";
+                tags[i] = "-RRB-";
+            }
+            words[i] = wordTag[0];
+            tags[i] = wordTag[1];
         }
 
         this.setTags(tags);

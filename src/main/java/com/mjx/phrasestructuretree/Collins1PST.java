@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public class PSTCollins1 extends PSTPennTreeBank{
+public class Collins1PST extends PennTreeBankPST {
 
-    public PSTCollins1(String treeStr){
+    public Collins1PST(String treeStr){
         super(treeStr);
     }
 

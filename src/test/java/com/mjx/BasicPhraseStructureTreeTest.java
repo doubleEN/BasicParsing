@@ -1,6 +1,6 @@
 package com.mjx;
 
-import com.mjx.phrasestructuretree.PSTPennTreeBank;
+import com.mjx.phrasestructuretree.PennTreeBankPST;
 import com.mjx.treefactory.PSTPennTreeBankFactory;
 import com.mjx.treeload.PennTreeBankStream;
 import com.mjx.treeload.TreeBankStream;
@@ -37,7 +37,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
 
         TreeBankStream treeBankStream = new PennTreeBankStream();
         originalTree = treeBankStream.format(originalTree);
-        String printTree = new PSTPennTreeBank(originalTree).toString();
+        String printTree = new PennTreeBankPST(originalTree).toString();
 
         assertEquals(printTree, originalTree);
     }
@@ -47,7 +47,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
      */
     public void testToRules() {
         String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(new PennTreeBankStream().format(tree));
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(new PennTreeBankStream().format(tree));
         List<Rule> rules = basicPhraseStructureTree.generateRuleSet();
 
         //转换得到的规则数量
@@ -65,7 +65,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
      */
     public void testSymbol() {
         String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(new PennTreeBankStream().format(tree));
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(new PennTreeBankStream().format(tree));
         Set<String> nonterminal = basicPhraseStructureTree.getNonterminals();
         Set<String> terminal = basicPhraseStructureTree.getTerminals();
 
@@ -92,7 +92,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
         String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
 
         TreeBankStream treeBankStream = new PennTreeBankStream();
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeBankStream.format(tree));
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeBankStream.format(tree));
 
         assertEquals(treeBankStream.format(tree), basicPhraseStructureTree.toString());
     }
@@ -119,7 +119,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
         String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
 
         TreeBankStream treeBankStream = new PennTreeBankStream();
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeBankStream.format(tree));
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeBankStream.format(tree));
 
         assertEquals("c1 c2 c3", basicPhraseStructureTree.getSentence(false));
         assertEquals("c1/B1 c2/B2 c3/A2", basicPhraseStructureTree.getSentence(true));
@@ -132,7 +132,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
         String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
 
         TreeBankStream treeBankStream = new PennTreeBankStream();
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeBankStream.format(tree));
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeBankStream.format(tree));
 
         assertTrue(basicPhraseStructureTree.hasSubTree("S", "A1", "A2"));
         assertTrue(basicPhraseStructureTree.hasSubTree("A1", "B1", "B2"));
@@ -148,7 +148,7 @@ public class BasicPhraseStructureTreeTest extends TestCase {
         String tree = "((S(A1(B1 c1)(B2 c2))(A2 c3)))";
 
         TreeBankStream treeBankStream = new PennTreeBankStream();
-        BasicPhraseStructureTree basicPhraseStructureTree = new PSTPennTreeBank(treeBankStream.format(tree));
+        BasicPhraseStructureTree basicPhraseStructureTree = new PennTreeBankPST(treeBankStream.format(tree));
 
         assertTrue(basicPhraseStructureTree.hasNode("S"));
         assertTrue(basicPhraseStructureTree.hasNode("A1"));

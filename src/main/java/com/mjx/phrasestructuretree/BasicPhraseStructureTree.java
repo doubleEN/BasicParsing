@@ -1,9 +1,6 @@
 package com.mjx.phrasestructuretree;
 
-import com.mjx.syntax.CNF;
-import com.mjx.syntax.LHS;
-import com.mjx.syntax.RHS;
-import com.mjx.syntax.Rule;
+import com.mjx.syntax.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -39,6 +36,7 @@ public abstract class BasicPhraseStructureTree {
     public BasicPhraseStructureTree(String treeStr) {
         this();
         this.generateTree(treeStr);
+//        this.processLexicon();
     }
 
     /**
@@ -238,53 +236,10 @@ public abstract class BasicPhraseStructureTree {
     }
 
     /**
-     * 直接从树形上处理unit productions情况。直接处理PennTreeBank上的两种unit productions 情况：
-     * 1.A-->B-->[C D]
-     * 2.A-->B-->d
-     *
-     * @return 返回unit productions的链式结构
+     * 直接从树形上处理unit productions情况。
+     * @return 返回unit productions的链式结构及其计数
      */
-    public Map<Rule[], Integer> getUnitProductionsChain() {
-        Map<Rule[], Integer> chain = new HashMap<>();
-        Queue<Node> queue = new LinkedList<>();
-        queue.offer(this.root);
-        while (!queue.isEmpty()) {
-            Node currNode = queue.poll();
-            if (currNode.numChild() == 1 && currNode.children.get(0).numChild() > 1) {
-                // A-->B-->[C D ...]
-                Rule[] rules = new Rule[2];
-                rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
-                String[] _rhs = new String[currNode.children.get(0).numChild()];
-                for (int i = 0; i < currNode.children.get(0).numChild(); ++i) {
-                    _rhs[i] = currNode.children.get(0).children.get(i).value;
-                }
-                rules[1] = new Rule(currNode.children.get(0).value, _rhs);
-                Integer num = chain.get(rules);
-                if (num != null) {
-                    ++num;
-                } else {
-                    num = 1;
-                }
-                chain.put(rules, num);
-            } else if (currNode.numChild() == 1 && currNode.children.get(0).numChild() == 1) {
-                //A-->B-->d
-                Rule[] rules = new Rule[2];
-                rules[0] = new Rule(currNode.value, currNode.children.get(0).value);
-                rules[1] = new Rule(currNode.children.get(0).value, currNode.children.get(0).children.get(0).value);
-                Integer num = chain.get(rules);
-                if (num != null) {
-                    ++num;
-                } else {
-                    num = 1;
-                }
-                chain.put(rules, num);
-            }
-            for (Node node : currNode.children) {
-                queue.offer(node);
-            }
-        }
-        return chain;
-    }
+    public abstract Map<RuleChain, Integer> getUnitProductionsChain() ;
 
     /**
      * 扫描是否包含unit productions
@@ -388,7 +343,66 @@ public abstract class BasicPhraseStructureTree {
         return subStr + "}";
     }
 
+
+    /**
+     * 对从语料库中加载得到的短语结构树的词汇序列进行加工
+     */
+    public abstract void processLexicon();
+
+    /**
+     * 依照PennTreeBank的格式，打印树的括号表达式
+     * 中序遍历树
+     */
+    public String printTree() {
+        int depth = 1;
+        String tree = this.printBranch(root, depth);
+        String newTree = "";
+        for (int i = 0; i < tree.length(); ++i) {
+            newTree += Character.toString(tree.charAt(i));
+            if (tree.charAt(i) == '\n') {
+                newTree += "  ";//根下是\t
+            }
+        }
+        return "(" + newTree + ")";
+    }
+
+    /**
+     * 打印Penn树形的递归方法
+     *
+     * @param subTree 当前待打印的树
+     * @param depth   当前树的根的深度
+     * @return 树的Penn树形
+     */
+    private String printBranch(Node subTree, int depth) {
+        //当前树的缩进量
+        String indent = "";
+        for (int i = 0; i < depth; ++i) {
+            indent += "  ";
+        }
+
+        String childStr = "(" + subTree.value;
+        List<Node> children = subTree.children;
+        //当前树的孩子中的(词性 词)形式的子树，是否被其他形式的子树隔开
+        boolean tailFlag = false;
+        for (Node child : children) {
+            if (child.numChild() == 1 && child.children.get(0).isLeaf()) {
+                if (tailFlag) {
+                    childStr += "\n" + indent;
+                }
+                childStr += "(" + child.value + " " + child.children.get(0).value + ") ";//尾部加一个空格
+            } else {
+                tailFlag = true;
+                childStr += "\n" + indent + printBranch(child, depth + 1);
+            }
+        }
+        return childStr + ")";
+    }
+
+    public abstract boolean convertCFGTree(CNF grammer);
+
+
     public static class Node {
+
 
         /**
          * 当前节点的符号
@@ -542,7 +556,6 @@ public abstract class BasicPhraseStructureTree {
                 return treeStr;
             }
         }
-
         @Override
         public boolean equals(Object obj) {
             if (obj == null) {
@@ -557,56 +570,6 @@ public abstract class BasicPhraseStructureTree {
             Node n = (Node) obj;
             return this.value.equals(n.value);
         }
+
     }
-
-    /**
-     * 依照PennTreeBank的格式，打印树的括号表达式
-     * 中序遍历树
-     */
-    public String printTree() {
-        int depth = 1;
-        String tree = this.printBranch(root, depth);
-        String newTree = "";
-        for (int i = 0; i < tree.length(); ++i) {
-            newTree += Character.toString(tree.charAt(i));
-            if (tree.charAt(i) == '\n') {
-                newTree += "  ";//根下是\t
-            }
-        }
-        return "(" + newTree + ")";
-    }
-
-    /**
-     * 打印Penn树形的递归方法
-     *
-     * @param subTree 当前待打印的树
-     * @param depth   当前树的根的深度
-     * @return 树的Penn树形
-     */
-    private String printBranch(Node subTree, int depth) {
-        //当前树的缩进量
-        String indent = "";
-        for (int i = 0; i < depth; ++i) {
-            indent += "  ";
-        }
-
-        String childStr = "(" + subTree.value;
-        List<Node> children = subTree.children;
-        //当前树的孩子中的(词性 词)形式的子树，是否被其他形式的子树隔开
-        boolean tailFlag = false;
-        for (Node child : children) {
-            if (child.numChild() == 1 && child.children.get(0).isLeaf()) {
-                if (tailFlag) {
-                    childStr += "\n" + indent;
-                }
-                childStr += "(" + child.value + " " + child.children.get(0).value + ") ";//尾部加一个空格
-            } else {
-                tailFlag = true;
-                childStr += "\n" + indent + printBranch(child, depth + 1);
-            }
-        }
-        return childStr + ")";
-    }
-
-    public abstract boolean convertCFGTree(CNF grammer);
 }

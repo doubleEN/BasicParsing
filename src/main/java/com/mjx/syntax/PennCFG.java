@@ -5,14 +5,22 @@ import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
 import java.util.*;
 
 public class PennCFG extends CNF {
+
     /**
      * PennCFG,上下文无关文法规则集
      */
     private Map<Rule, Integer> CFGRules = new HashMap<Rule, Integer>();
 
-    private Map<Rule[], Integer> ruleChains = new HashMap<>();
+    private Map<RuleChain, Integer> ruleChains = new HashMap<>();
 
-    private Map<Rule, Rule> ruleToRule;
+    /**
+     * <Rule1,Rule2>，在A-->B-->t中，Rule1是A-->t,Rule2是A-->B
+     */
+    private Map<Rule, Set<RuleChain>> ruleChain;
+
+    public Map<Rule, Set<RuleChain>> getRuleChain() {
+        return ruleChain;
+    }
 
     public PennCFG() {
     }
@@ -24,9 +32,9 @@ public class PennCFG extends CNF {
         this.addRuleChain(phraseStructureTree.getUnitProductionsChain());
     }
 
-    private void addRuleChain(Map<Rule[], Integer> ruleChains) {
-        Set<Map.Entry<Rule[], Integer>> entries = ruleChains.entrySet();
-        for (Map.Entry<Rule[], Integer> entry : entries) {
+    private void addRuleChain(Map<RuleChain, Integer> ruleChains) {
+        Set<Map.Entry<RuleChain, Integer>> entries = ruleChains.entrySet();
+        for (Map.Entry<RuleChain, Integer> entry : entries) {
             if (ruleChains.get(entry.getKey()) == null) {
                 this.ruleChains.put(entry.getKey(), entry.getValue());
             } else {
@@ -72,19 +80,17 @@ public class PennCFG extends CNF {
     @Override
     public void convertToCNFs() {
         this.constructCNF();
-        this.ruleToRule = new HashMap<>();
+        this.ruleChain = new HashMap<>();
 
         Map<Rule, Integer> tempRules = new HashMap<>();
         tempRules.putAll(this.CFGRules);
 
         //处理unit productions,且在正则文法规则和long rhs之前处理，因为存在A-->B-->C D..，这样的语法
-        Iterator<Map.Entry<Rule[], Integer>> iter1 = this.ruleChains.entrySet().iterator();
+        Iterator<Map.Entry<RuleChain, Integer>> iter1 = this.ruleChains.entrySet().iterator();
         while (iter1.hasNext()) {
-            Map.Entry<Rule[], Integer> chain = iter1.next();
-            Rule rule1 = chain.getKey()[0];
-            Rule rule2 = chain.getKey()[1];
-            Rule newRule = new Rule(rule1.getLHS(), rule2.getRHS());
-            if (rule2.lenOfRHS() > 1) {
+            Map.Entry<RuleChain, Integer> chain = iter1.next();
+            Rule newRule =chain.getKey().getEqualRule();
+            if (newRule.lenOfRHS() > 1) {
                 //A-->B-->CDE..转化为A-->CDE..，放入tempRules，以便对long RHS进行处理
                 Integer num = tempRules.get(newRule);
                 if (num == null) {
@@ -93,16 +99,31 @@ public class PennCFG extends CNF {
                     tempRules.put(newRule, chain.getValue() + num);
                 }
                 //删除处理完的unit productions，可能重复删除
-                this.ruleToRule.put(newRule, rule1);
-                tempRules.remove(rule1);
-                tempRules.remove(rule2);
-            } else if (rule2.lenOfRHS() == 1) {
+                Set<RuleChain> ruleSet = this.ruleChain.get(newRule);
+                if (ruleSet == null) {
+                    ruleSet = new HashSet<>();
+                }
+                ruleSet.add(chain.getKey());
+                this.ruleChain.put(newRule, ruleSet);
+                Rule[] userlessRules = chain.getKey().getRuleChain();
+                for (Rule rule : userlessRules) {
+                    tempRules.remove(rule);
+                }
+            } else if (chain.getKey().getTailLen() == 1) {
                 //A-->B-->d转化为A-->d
                 // 1.一般的unit productions处理后加入CNF
                 this.addCNFRule(newRule);
-                this.ruleToRule.put(newRule, rule1);
-                tempRules.remove(rule1);
-                tempRules.remove(rule2);//直接删除词性规则，是否欠考虑
+                Set<RuleChain> ruleSet = this.ruleChain.get(newRule);
+                if (ruleSet == null) {
+                    ruleSet = new HashSet<>();//使用TreeSet，而不是HashSet
+                }
+                ruleSet.add(chain.getKey());
+                this.addCNFRule(newRule);
+                this.ruleChain.put(newRule, ruleSet);
+                Rule[] userlessRules = chain.getKey().getRuleChain();
+                for (Rule rule : userlessRules) {
+                    tempRules.remove(rule);
+                }
             }
         }
 
@@ -130,6 +151,7 @@ public class PennCFG extends CNF {
         while (iter3.hasNext()) {
             Map.Entry<Rule, Integer> entry = iter3.next();
             if (entry.getKey().lenOfRHS() < 3) {
+                System.out.println(entry.getKey());
                 throw new IllegalArgumentException("存在RHS长度低于3的规则未处理完。");
             }
             this.cutLongRHS(entry.getKey(), newRules);
@@ -187,24 +209,24 @@ public class PennCFG extends CNF {
     }
 
     @Override
-    public Rule getUnitProductions(Rule rule) {
-        return this.ruleToRule.get(rule);
+    public Set<RuleChain> getUnitProductionChain(Rule rule) {
+        return this.ruleChain.get(rule);
     }
 
-    @Override //particular
+    @Override
     public String printGrammer() {
-        String content = super.printGrammer()+"\nParticular Content of "+this.getClass().getName()+"\n\n>>>[PennCFG_Rules]\n";
+        String content = super.printGrammer() + "\nParticular Content of " + this.getClass().getName() + "\n\n>>>[PennCFG_Rules]\n";
         Set<Map.Entry<Rule, Integer>> entries = this.CFGRules.entrySet();
-        System.out.println("CFG规则集大小："+this.CFGRules.size());
+        System.out.println("CFG规则集大小：" + this.CFGRules.size());
         String[] rules = new String[this.CFGRules.size()];
-        int i=0;
+        int i = 0;
         for (Map.Entry<Rule, Integer> entry : entries) {
             rules[i] = entry.getKey().toString();
             ++i;
         }
         Arrays.sort(rules);
-        String ruleStr=Arrays.toString(rules);
-        content += ruleStr.substring(1,ruleStr.length()-1).replaceAll("],","]\n");
+        String ruleStr = Arrays.toString(rules);
+        content += ruleStr.substring(1, ruleStr.length() - 1).replaceAll("],", "]\n");
         return content;
     }
 }

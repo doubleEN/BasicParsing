@@ -230,6 +230,9 @@ public abstract class CNF {
     }
 
 
+    /**
+     * 由正则文法的RHS查找所有对应的LHS
+     */
     public Set<LHS> searchLHS(String... rhs) {
         if (rhs.length == 1) {
             return this.rtl.get(new RHS(rhs[0]));
@@ -241,11 +244,18 @@ public abstract class CNF {
         }
     }
 
+    /**
+     * 由正则文法的LHS查找所有对应的RHS
+     */
     public Set<RHS> searchRHS(String lhs) {
         return this.ltr.get(new LHS(lhs));
     }
 
-    public abstract Rule getUnitProductions(Rule rule);
+
+    /**
+     * 由消除unit productions的A-->t，超照原本的A-->B
+     */
+    public abstract Set<RuleChain> getUnitProductionChain(Rule rule);
 
     /**
      * 是否包含CFG规则

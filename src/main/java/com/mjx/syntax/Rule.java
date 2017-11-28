@@ -1,6 +1,6 @@
 package com.mjx.syntax;
 
-public class Rule {
+public class Rule{
 
     private LHS lhs;
 
@@ -59,4 +59,5 @@ public class Rule {
     public String toString() {
         return this.lhs.toString() + "-->" + this.rhs.toString();
     }
+
 }
