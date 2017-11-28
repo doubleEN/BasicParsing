@@ -2,8 +2,18 @@ package com.mjx.syntax;
 
 import java.util.Arrays;
 
+/**
+ * 规则链类，存储 A-->B-->C-->d;A-->B-->C-->[D E] 这样的链式结构
+ */
 public class RuleChain {
+    /**
+     * A-->B-->C-->[D E]中的[A,B,C]
+     */
     private String[] singleSymbols;
+
+    /**
+     * A-->B-->C-->[D E]中的[D,E]
+     */
     private String[] tailRHS;
 
     public RuleChain(String[] singleSymbols,String[] tailRHS) {
@@ -11,6 +21,9 @@ public class RuleChain {
         this.tailRHS = tailRHS;
     }
 
+    /**
+     *  规则链提炼出有序的对应规则序列
+     */
     public Rule[] getRuleChain(){
         Rule[] ruleChain = new Rule[this.singleSymbols.length];
         for (int index=0;index<ruleChain.length-1;++index) {
@@ -20,6 +33,9 @@ public class RuleChain {
         return ruleChain;
     }
 
+    /**
+     * 返回A-->B-->C-->[D,E]的等价规则 A-->[D,E]
+     */
     public Rule getEqualRule(){
         return new Rule(singleSymbols[0], tailRHS);
     }
@@ -46,10 +62,16 @@ public class RuleChain {
         return false;
     }
 
+    /**
+     * 返回规则链的长度
+     */
     public int getChainLen() {
         return this.singleSymbols.length+1;
     }
 
+    /**
+     * 返回规则链末端的长度，如A-->B-->C-->[D E]的末端长度为2
+     */
     public int getTailLen() {
         return this.tailRHS.length;
     }

@@ -10,6 +10,10 @@ public class Collins1PST extends PennTreeBankPST {
         super(treeStr);
     }
 
+    public Collins1PST(String treeStr,boolean removeNone){
+        super(treeStr,removeNone);
+    }
+
     @Override
     public void generateTree(String treeStr) {
         List<String> parts = new ArrayList<String>();

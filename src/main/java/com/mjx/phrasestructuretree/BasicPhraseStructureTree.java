@@ -31,13 +31,23 @@ public abstract class BasicPhraseStructureTree {
     }
 
     /**
-     * 传入PhraseStructureTree能够处理的短语结构树括号表达式
+     * 传入PhraseStructureTree能够处理的短语结构树括号表达式,默认不处理NONE element
      */
     public BasicPhraseStructureTree(String treeStr) {
         this();
         this.generateTree(treeStr);
-//        this.processLexicon();
     }
+
+    /**
+     * 传入PhraseStructureTree能够处理的短语结构树括号表达式，根据removeNone处理NONE element
+     */
+    public BasicPhraseStructureTree(String treeStr,boolean removeNone) {
+        this(treeStr);
+        if (removeNone) {
+            this.processLexicon();
+        }
+    }
+
 
     /**
      * 传入PhraseStructureTree能够处理的短语结构树括号表达式
@@ -347,7 +357,7 @@ public abstract class BasicPhraseStructureTree {
     /**
      * 对从语料库中加载得到的短语结构树的词汇序列进行加工
      */
-    public abstract void processLexicon();
+    protected abstract boolean processLexicon();
 
     /**
      * 依照PennTreeBank的格式，打印树的括号表达式

@@ -18,6 +18,13 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
     /**
      * 传入PhraseStructureTree能够处理的短语结构树括号表达式
      */
+    public PennTreeBankPST(String treeStr,boolean removeNone) {
+        super(treeStr,removeNone);
+    }
+
+    /**
+     * 传入PhraseStructureTree能够处理的短语结构树括号表达式
+     */
     public PennTreeBankPST(Node root) {
         super(root);
     }
@@ -76,6 +83,7 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
 
     /**
      * 将一颗短语结构树转化为上下文无关文法的树(重构)
+     *
      * @return 转化前后的树是否一致
      */
     public boolean convertCFGTree(CNF grammer) {
@@ -194,17 +202,15 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
     }
 
     @Override
-    public void processLexicon() {
-        this.eliminateNoneElement();
+    protected boolean processLexicon() {
+        return this.eliminateNoneElement();
     }
 
     /**
      * 从树形上删除[none-element](正则处理的可行性)
      */
-    public void eliminateNoneElement() {
-//        treeBracket = treeBracket.replaceAll("\\)\\(-NONE- .*?\\)", ")");//(-NONE- *U*)
-//        treeBracket = treeBracket.replaceAll("\\([^()]*?\\(-NONE-.*?\\)\\)", "");
-//        treeBracket = treeBracket.replaceAll("\\)\\(-NONE- .*?\\)", ")");//(-NONE- *U*)
+    private boolean eliminateNoneElement() {
+        boolean flag = false;
 
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.getRoot());
@@ -213,6 +219,7 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
             Node currNode = queue.poll();
 
             if (currNode.getValue().equals("-NONE-")) {
+                flag = true;
                 Node parent = currNode.getParent();
                 if (parent.numChild() == 1) {
                     //P-->NONE-->*
@@ -249,5 +256,6 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
             }
 
         }
+        return flag;
     }
 }
