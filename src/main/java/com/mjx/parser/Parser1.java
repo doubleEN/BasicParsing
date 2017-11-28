@@ -31,7 +31,7 @@ public class Parser1 extends CKYParser {
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
                 pennCFG.expandGrammer(phraseStructureTree);
                 if (phraseStructureTree.toString().indexOf("(JJ anti-takeover)(NN plan)") > 0) {
-                    System.out.println("目标树：" + phraseStructureTree);
+                    System.out.println("正确解析树：" + phraseStructureTree);
                     //(S(NP-SBJ(DT The)(NN company))(ADVP(RB also))(VP(VBD adopted)(NP(DT an)(JJ anti-takeover)(NN plan)))(. .))
                 }
             }
