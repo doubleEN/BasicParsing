@@ -97,6 +97,7 @@ public class PennCFG extends CNF {
                 // 1.一般的unit productions处理后加入CNF
                 this.addCNFRule(newRule);
                 Set<RuleChain> ruleSet = this.ruleChain.get(newRule);
+                List<RuleChain> ruleSet2 = new ArrayList<>();
                 if (ruleSet == null) {
                     ruleSet = new HashSet<>();
                 }

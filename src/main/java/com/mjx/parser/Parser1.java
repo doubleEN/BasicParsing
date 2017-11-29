@@ -24,7 +24,7 @@ public class Parser1 extends CKYParser {
         TreeFactory treeFactory = new PSTPennTreeBankFactory(true);
         CNF pennCFG = new PennCFG();
         //加载PennTreeBank
-           for (int no = 1; no < 200; ++no) {
+        for (int no = 1; no < 200; ++no) {
             String treeBank = PennTreeBankUtil.getCombinedPath() + "/wsj_" + PennTreeBankUtil.ensureLen(no) + ".mrg";
             bankStream.openTreeBank(treeBank, "utf-8", treeFactory);
             BasicPhraseStructureTree phraseStructureTree = null;
@@ -39,12 +39,17 @@ public class Parser1 extends CKYParser {
 
         pennCFG.convertToCNFs();
         CKYParser ckyParser = new Parser1(pennCFG);
-        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("The company also adopted an anti-takeover plan .");
+        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Kalipharma is a New Jersey-based pharmaceuticals concern . ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
-            System.out.println("正则文法树："+phraseStructureTree);
-            if (!phraseStructureTree.convertCFGTree(pennCFG)) {
-                System.out.println("正则树转化："+phraseStructureTree);
+            BasicPhraseStructureTree[] trees = null;
+            trees = phraseStructureTree.convertCFGTree(pennCFG);
+            if (trees != null&&trees.length>1) {
+                System.out.println(phraseStructureTree.dictTree());
+                for (BasicPhraseStructureTree tree : trees) {
+                    System.out.println(tree.dictTree());
+                }
             }
+
         }
         //穷举结果中，存在正确的树形。
     }

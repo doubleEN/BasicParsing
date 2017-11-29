@@ -415,7 +415,7 @@ public abstract class BasicPhraseStructureTree {
      * @param grammer
      * @return
      */
-    public abstract boolean convertCFGTree(CNF grammer);
+    public abstract BasicPhraseStructureTree[] convertCFGTree(CNF grammer);
 
 
     /**

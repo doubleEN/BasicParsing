@@ -86,18 +86,16 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
      *
      * @return 转化前后的树是否一致
      */
-    public boolean convertCFGTree(CNF grammer) {
+    public BasicPhraseStructureTree[] convertCFGTree(CNF grammer) {
         String treeStr = this.toString();
         //首先还原longRHS
         this.restoreLongRHS();
         if (this.getRoot() == null) {
             //自定义符作为树根的树无效，直接忽略
-            return true;
+            return null;
         }
-        //然后还原unit productions
-        this.restoreUnitProductions(grammer);
-
-        return this.toString().equals(treeStr);
+        //还原unit productions
+        return this.restoreUnitProductions(grammer);
     }
 
     private void restoreLongRHS() {
@@ -114,7 +112,6 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
                 //新构造的短语结构符成为了树根。问题可能存在于cutLong时，在新的空间构造新规则集，没有考虑原CFG中 A-->BC 的存在，而是构造了rulex-->BC
                 //但是，在CNF是存在A-->BC这条规则的，所以，判定这棵正则文法树不存在相应的上下文无关文法树。
                 if (currNode.isRoot()) {
-//                    System.out.println("这棵正则文法树不存在相应的上下文无关文法树。");
                     this.setRoot(null);
                     return false;
                 }
@@ -145,7 +142,50 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
         return false;
     }
 
-    private void restoreUnitProductions(CNF grammer) {
+    private BasicPhraseStructureTree[] restoreUnitProductions(CNF grammer) {
+        List<BasicPhraseStructureTree> basicPhraseStructureTrees = new ArrayList<>();
+
+        Set<Map.Entry<Rule, Set<RuleChain>>> entries = this.scanTree(grammer).entrySet();
+
+        //所有树形数量
+        int branchNum = 1;
+        for (Map.Entry<Rule, Set<RuleChain>> entry : entries) {
+            branchNum *= entry.getValue().size();
+        }
+
+        List<Map<Rule, RuleChain>> allBranches = new ArrayList<>();
+        for (int i=0;i< branchNum;++i) {
+            allBranches.add(new HashMap<>());
+        }
+
+        for (Map.Entry<Rule, Set<RuleChain>> entry : entries) {
+            int order = 0;
+            for (RuleChain chain : entry.getValue()) {
+                int num = 0;
+                int count = branchNum / entry.getValue().size();
+                while (num < count) {
+                    Map<Rule, RuleChain> oneBranch = allBranches.get(order + entry.getValue().size() * num);
+                    oneBranch.put(entry.getKey(), chain);
+                    ++num;
+                }
+                ++order;
+            }
+        }
+
+        for (Map<Rule, RuleChain> oneBranch : allBranches) {
+            basicPhraseStructureTrees.add(this.restoreTree(oneBranch));
+        }
+        return basicPhraseStructureTrees.toArray(new BasicPhraseStructureTree[]{});
+    }
+
+    /**
+     * 扫描记录树形上由unit productions造成的多分枝情况
+     * @param grammer
+     * @return 返回的Map<Rule, Set<RuleChain>>，Set<RuleChain>可能会忽略树中相同的规则
+     */
+    private Map<Rule, Set<RuleChain>> scanTree(CNF grammer) {
+
+        Map<Rule, Set<RuleChain>> branches = new HashMap<>();
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.getRoot());
         while (!queue.isEmpty()) {
@@ -154,19 +194,38 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
             for (int i = 0; i < currNode.getChildren().length; ++i) {
                 children[i] = currNode.getChildren()[i].getValue();
             }
-            Set<RuleChain> unitProductionsRules = grammer.getUnitProductionChain(new Rule(currNode.getValue(), children));
-            RuleChain chain = null;
-            if (unitProductionsRules != null && unitProductionsRules.size() > 1) {
-                System.out.println("还原unit productions时，存在多种还原路径，取一种还原路径。");
-                for (RuleChain c : unitProductionsRules) {
-                    chain = c;
-                    break;
-                }
-                Rule[] rules = chain.getRuleChain();
-                currNode.getChildren()[0].setParent(null);
+            Rule r = new Rule(currNode.getValue(), children);
+            Set<RuleChain> unitProductionsRules = grammer.getUnitProductionChain(r);
+            if (unitProductionsRules != null) {
+                branches.put(r, new HashSet<>(unitProductionsRules));
+            }
+            for (Node child : currNode.getChildren()) {
+                queue.offer(child);
+            }
+        }
+
+        return branches;
+    }
+
+    private BasicPhraseStructureTree restoreTree(Map<Rule, RuleChain> oneBranch) {
+        //在新的树上操作
+
+        BasicPhraseStructureTree newTree = new PennTreeBankPST(this.toString());
+        Queue<Node> queue = new LinkedList<>();
+        queue.offer(newTree.getRoot());
+        while (!queue.isEmpty()) {
+            Node currNode = queue.poll();
+            String[] children = new String[currNode.getChildren().length];
+            for (int i = 0; i < currNode.getChildren().length; ++i) {
+                children[i] = currNode.getChildren()[i].getValue();
+            }
+            RuleChain currChain = oneBranch.get(new Rule(currNode.getValue(), children));
+            if (currChain != null) {
+                Rule[] rules = currChain.getRuleChain();
+                Node[] originChildren=currNode.getChildren();
                 currNode.resetChildren();
                 Node tempNode = currNode;
-                if (chain.getTailLen() == 1) {
+                if (currChain.getTailLen() == 1) {
                     //还原A-->B-->d，处理到了叶子，子树不需要再进行遍历
                     for (Rule rule : rules) {
                         Node newNode = new Node(rule.getRHS().getValues()[0]);
@@ -174,6 +233,7 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
                         newNode.setParent(tempNode);
                         tempNode = newNode;
                     }
+                    originChildren[0].setParent(null);
                 } else {
                     //还原A-->B-->CD..。这种unit productions的结构恢复要另外验证
                     for (Rule rule : rules) {
@@ -183,23 +243,24 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
                             newNode.setParent(tempNode);
                             tempNode = newNode;
                         } else {
-                            for (String child : rule.getRHS().getValues()) {
-                                Node newNode = new Node(child);
-                                tempNode.addChild(newNode);
-                                newNode.setParent(tempNode);
-                                queue.offer(newNode);//孩子节点进栈
+                            for (Node child :originChildren) {
+                                tempNode.addChild(child);
+                                child.setParent(tempNode);
+                                queue.offer(child);//孩子节点进栈
                             }
                         }
                     }
                 }
+
             } else {
                 for (Node child : currNode.getChildren()) {
                     queue.offer(child);
                 }
             }
         }
-
+        return newTree;
     }
+
 
     @Override
     protected boolean processLexicon() {
