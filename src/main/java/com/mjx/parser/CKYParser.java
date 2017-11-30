@@ -125,10 +125,10 @@ public abstract class CKYParser {
                 //当前格可能的LHS
                 Map<int[], String> currCell = new HashMap<>();
                 //为了填充单元格[row,col]，在可选的span上选择RHS的组合情况
-                for (int spanHead = col, spanTail = col + 1; spanHead < row && spanTail < row + 1; ++spanHead, ++spanTail) {
-                    //在下三角矩阵上，span的上的RHS选择有明确的数学关系：(row,col)-->( each[col,row) ,col) (row, each[col+1,row+1] )
-                    String[] firstChild = this.parseTable[spanHead][col];
-                    String[] secondChild = this.parseTable[row][spanTail];
+                for (int cutoff = col; cutoff < row; ++cutoff) {
+                    //在下三角矩阵上，span的上的RHS选择有明确的数学关系：(row,col)-->( cutoff∈[col,row) ,col) (row, cutoff+1 )
+                    String[] firstChild = this.parseTable[cutoff][col];
+                    String[] secondChild = this.parseTable[row][cutoff+1];
                     //当前span的切分上，没有有效的孩子
                     if (firstChild == null || secondChild == null) {
                         continue;
@@ -144,7 +144,7 @@ public abstract class CKYParser {
                             }
                             //不同的左右child，可能出现相同的LHS,允许相同的LHS出现,size区分相同的RHS，但不同的LHS
                             for (LHS _lhs : partLHS) {
-                                int[] index = new int[]{currCell.size(), spanHead, col, first, row, spanTail, second};
+                                int[] index = new int[]{currCell.size(), cutoff, col, first, row, cutoff+1, second};
                                 currCell.put(index, _lhs.getValue());
                             }
                         }
