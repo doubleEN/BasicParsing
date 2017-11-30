@@ -4,6 +4,9 @@ import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
 
 import java.util.*;
 
+/**
+ * 乔姆斯基正则文法类
+ */
 public abstract class CNF {
 
     /**
@@ -31,6 +34,9 @@ public abstract class CNF {
      */
     private Set<String> terminals = new HashSet<>();
 
+    /**
+     * 同意构造CNF三个树形的方法
+     */
     protected void constructCNF() {
         this.CNFRules = new HashSet<>();
         this.ltr = new HashMap<>();
@@ -247,14 +253,6 @@ public abstract class CNF {
      * 是否包含CFG规则
      */
     public abstract boolean containCFGRule(Rule rule);
-
-    public void setRtl(Map<RHS, Set<LHS>> rtl) {
-        this.rtl = rtl;
-    }
-
-    public void setLtr(Map<LHS, Set<RHS>> ltr) {
-        this.ltr = ltr;
-    }
 
     /**
      * 格式化打印当前文法集内容

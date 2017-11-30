@@ -250,7 +250,7 @@ public class DataAnalysis {
         for (BasicPhraseStructureTree tree : this.phraseStructureTrees) {
             String t = "";
             if (tree.hasUnitProductions() != null) {
-                bw.write(tree.dictTree());
+                bw.write(tree.toString());
                 bw.newLine();
                 bw.flush();
             }

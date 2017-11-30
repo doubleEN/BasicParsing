@@ -5,6 +5,9 @@ import com.mjx.treefactory.TreeFactory;
 
 import java.io.*;
 
+/**
+ * PennTreeBank短语结构树访问流
+ */
 public class PennTreeBankStream implements TreeBankStream {
 
     /**

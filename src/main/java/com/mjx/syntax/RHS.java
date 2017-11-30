@@ -2,6 +2,9 @@ package com.mjx.syntax;
 
 import java.util.Arrays;
 
+/**
+ * 文法派生规则的 Right hand side
+ */
 public class RHS {
 
     private String[] values;
@@ -15,7 +18,7 @@ public class RHS {
     }
 
     /**
-     * 暴露了RHS的存储结构!!!!!
+     * 有序获得RHS的各个值
      */
     public String[] getValues() {
         return this.values;

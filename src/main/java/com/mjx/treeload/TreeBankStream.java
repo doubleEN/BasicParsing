@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
 /**
- * 读取文本中的树。
+ * 树库访问流，以一棵树的粒度顺序访问文本中的树
  */
 public interface TreeBankStream {
 

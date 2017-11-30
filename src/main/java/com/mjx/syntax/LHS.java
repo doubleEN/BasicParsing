@@ -1,7 +1,13 @@
 package com.mjx.syntax;
 
+/**
+ * 文法派生规则的 Left hand side
+ */
 public class LHS {
 
+    /**
+     * LHS值
+     */
     private String value;
 
     public LHS(String symbol) {

@@ -6,6 +6,9 @@ import com.mjx.syntax.RuleChain;
 
 import java.util.*;
 
+/**
+ * PennTreeBank句法结构树操作及相应行为定义
+ */
 public class PennTreeBankPST extends BasicPhraseStructureTree {
 
     /**
@@ -84,7 +87,7 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
     /**
      * 将一颗短语结构树转化为上下文无关文法的树(重构)
      *
-     * @return 转化前后的树是否一致
+     * @return 由于在树形中增加unit productions的情况，可能会穷举产生多棵树
      */
     public BasicPhraseStructureTree[] convertCFGTree(CNF grammer) {
         String treeStr = this.toString();
@@ -98,11 +101,13 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
         return this.restoreUnitProductions(grammer);
     }
 
+    /**
+     * 恢复long RHS的树枝
+     */
     private void restoreLongRHS() {
         while (this.linkRHS(this.getRoot())) {
         }
     }
-
     private boolean linkRHS(Node node) {
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.getRoot());
@@ -142,6 +147,9 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
         return false;
     }
 
+    /**
+     * 恢复unit productions的多分枝
+     */
     private BasicPhraseStructureTree[] restoreUnitProductions(CNF grammer) {
         List<BasicPhraseStructureTree> basicPhraseStructureTrees = new ArrayList<>();
 
@@ -209,8 +217,8 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
 
     private BasicPhraseStructureTree restoreTree(Map<Rule, RuleChain> oneBranch) {
         //在新的树上操作
-
         BasicPhraseStructureTree newTree = new PennTreeBankPST(this.toString());
+
         Queue<Node> queue = new LinkedList<>();
         queue.offer(newTree.getRoot());
         while (!queue.isEmpty()) {
@@ -262,6 +270,10 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
     }
 
 
+    /**
+     * 从树形上，对词汇序列加工
+     * @return 加工后，树形词汇序列是否发生改变
+     */
     @Override
     protected boolean processLexicon() {
         return this.eliminateNoneElement();
@@ -275,7 +287,6 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
 
         Queue<Node> queue = new LinkedList<>();
         queue.offer(this.getRoot());
-        String tree = this.dictTree();
         while (!queue.isEmpty()) {
             Node currNode = queue.poll();
 

@@ -4,6 +4,9 @@ import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
 
 import java.util.*;
 
+/**
+ * PeenTreeBank 上下文无关文法类
+ */
 public class PennCFG extends CNF {
 
     /**
@@ -32,6 +35,9 @@ public class PennCFG extends CNF {
         this.addRuleChain(phraseStructureTree.getUnitProductionsChain());
     }
 
+    /**
+     * 添加由unit productions形成的chain of rule
+     */
     private void addRuleChain(Map<RuleChain, Integer> ruleChains) {
         Set<Map.Entry<RuleChain, Integer>> entries = ruleChains.entrySet();
         for (Map.Entry<RuleChain, Integer> entry : entries) {

@@ -7,6 +7,9 @@ import com.mjx.syntax.LHS;
 
 import java.util.*;
 
+/**
+ * 无概率的CKY短语结构树解析
+ */
 public abstract class CKYParser {
 
     /**
@@ -218,10 +221,16 @@ public abstract class CKYParser {
      */
     public abstract void formatSentence(String sentence);
 
+    /**
+     * 生句赋值
+     */
     public void setWords(String[] words) {
         this.words = words;
     }
 
+    /**
+     * 句子词性序列赋值
+     */
     public void setTags(String[] tags) {
         this.tags = tags;
     }

@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * Collins第一种句法结构树，尚未定义
+ */
 public class Collins1PST extends PennTreeBankPST {
 
     public Collins1PST(String treeStr) {

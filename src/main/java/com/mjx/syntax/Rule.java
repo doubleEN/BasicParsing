@@ -1,5 +1,8 @@
 package com.mjx.syntax;
 
+/**
+ * 文法派生规则类
+ */
 public class Rule{
 
     private LHS lhs;
@@ -14,14 +17,6 @@ public class Rule{
     public Rule(String lhs, String... rhs) {
         this.rhs = new RHS(rhs);
         this.lhs = new LHS(lhs);
-    }
-
-    public void setLhs(LHS lhs) {
-        this.lhs = lhs;
-    }
-
-    public void setRhs(RHS rhs) {
-        this.rhs = rhs;
     }
 
     public int lenOfRHS() {
