@@ -10,7 +10,7 @@ import java.util.*;
 /**
  * 无概率的CKY短语结构树解析
  */
-public abstract class CKYParser {
+public abstract class CYKParser {
 
     /**
      * 文法集
@@ -42,7 +42,7 @@ public abstract class CKYParser {
      */
     private int count = 0;
 
-    public CKYParser(CNF cnf) {
+    public CYKParser(CNF cnf) {
         this.cnf = cnf;
     }
 
@@ -126,7 +126,7 @@ public abstract class CKYParser {
                 Map<int[], String> currCell = new HashMap<>();
                 //为了填充单元格[row,col]，在可选的span上选择RHS的组合情况
                 for (int cutoff = col; cutoff < row; ++cutoff) {
-                    //在下三角矩阵上，span的上的RHS选择有明确的数学关系：(row,col)-->( cutoff∈[col,row) ,col) (row, cutoff+1 )
+                    //在下三角矩阵上，span的上的RHS选择有明确的数学关系：(row,col)-->( cutoff∈[col,row) ,col) (row, cutoff+1)
                     String[] firstChild = this.parseTable[cutoff][col];
                     String[] secondChild = this.parseTable[row][cutoff+1];
                     //当前span的切分上，没有有效的孩子

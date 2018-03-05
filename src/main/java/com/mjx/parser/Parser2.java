@@ -2,7 +2,7 @@ package com.mjx.parser;
 
 import com.mjx.syntax.CNF;
 
-public class Parser2 extends CKYParser {
+public class Parser2 extends CYKParser {
 
     public Parser2(CNF cnf) {
         super(cnf);

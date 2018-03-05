@@ -114,8 +114,6 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
         while (!queue.isEmpty()) {
             Node currNode = queue.poll();
             if (currNode.getValue().length() > 3 && currNode.getValue().substring(0, 4).equals("rule")) {
-                //新构造的短语结构符成为了树根。问题可能存在于cutLong时，在新的空间构造新规则集，没有考虑原CFG中 A-->BC 的存在，而是构造了rulex-->BC
-                //但是，在CNF是存在A-->BC这条规则的，所以，判定这棵正则文法树不存在相应的上下文无关文法树。
                 if (currNode.isRoot()) {
                     this.setRoot(null);
                     return false;
@@ -270,10 +268,6 @@ public class PennTreeBankPST extends BasicPhraseStructureTree {
     }
 
 
-    /**
-     * 从树形上，对词汇序列加工
-     * @return 加工后，树形词汇序列是否发生改变
-     */
     @Override
     protected boolean processLexicon() {
         return this.eliminateNoneElement();

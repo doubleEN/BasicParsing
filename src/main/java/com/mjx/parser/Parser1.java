@@ -1,8 +1,6 @@
 package com.mjx.parser;
 
 import com.mjx.phrasestructuretree.BasicPhraseStructureTree;
-import com.mjx.syntax.Rule;
-import com.mjx.syntax.RuleChain;
 import com.mjx.treefactory.PSTPennTreeBankFactory;
 import com.mjx.treefactory.TreeFactory;
 import com.mjx.treeload.PennTreeBankStream;
@@ -11,12 +9,7 @@ import com.mjx.syntax.CNF;
 import com.mjx.syntax.PennCFG;
 import com.mjx.utils.PennTreeBankUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.Map;
-import java.util.Set;
-
-public class Parser1 extends CKYParser {
+public class Parser1 extends CYKParser {
 
     public static void main(String[] args) throws Exception {
         //构造树的过程中去掉none element
@@ -30,6 +23,7 @@ public class Parser1 extends CKYParser {
             bankStream.openTreeBank(treeBank, "utf-8", treeFactory);
             BasicPhraseStructureTree phraseStructureTree = null;
             while ((phraseStructureTree = bankStream.readNextTree()) != null) {
+                //此时在pennCFG中加载了unit productions
                 pennCFG.expandGrammer(phraseStructureTree);
                 if (phraseStructureTree.toString().indexOf("(JJ anti-takeover)(NN plan)") > 0) {
                     System.out.println("正确解析树：" + phraseStructureTree);
@@ -41,9 +35,9 @@ public class Parser1 extends CKYParser {
         //加载的Penn CFG转化为标准的CNF
         pennCFG.convertToCNFs();
         //构造cky解析工具
-        CKYParser ckyParser = new Parser1(pennCFG);
+        CYKParser CYKParser = new Parser1(pennCFG);
         //解析生句得到多个穷举结果
-        BasicPhraseStructureTree[] phraseStructureTrees = ckyParser.parsing("Kalipharma is a New Jersey-based pharmaceuticals concern . ");
+        BasicPhraseStructureTree[] phraseStructureTrees = CYKParser.parsing("Kalipharma is a New Jersey-based pharmaceuticals concern . ");
         for (BasicPhraseStructureTree phraseStructureTree : phraseStructureTrees) {
             //CNF树还原为CFG树，还原的过程中，再次衍生出多个还原结果
             BasicPhraseStructureTree[] trees = phraseStructureTree.convertCFGTree(pennCFG);

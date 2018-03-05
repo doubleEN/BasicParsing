@@ -101,7 +101,6 @@ public abstract class BasicPhraseStructureTree {
 
     /**
      * 解析固定格式的树的括号表达式，得到短语结构树。同时得到终结符和非终结符。(重构，在生成树的过程中直接得到规则)
-     *
      * @param treeStr 树的括号表达式
      * @return 短语结构树
      */
@@ -326,6 +325,34 @@ public abstract class BasicPhraseStructureTree {
     public String toString() {
         return this.root.toString();
     }
+
+    /**
+     * 先序遍历打印树的python的字典形式
+     */
+    @Deprecated
+    public String dictTree() {
+        int depth = 0;
+        return this.partTree(root, depth);
+    }
+
+    @Deprecated
+    private String partTree(Node node, int depth) {
+        if (node.isLeaf()) {
+            return "\"" + node.value + "\"";
+        }
+        String subStr = "{\"" + node.value + "\":{";
+        for (int i = 0; i < node.children.size(); ++i) {
+            if (i == node.children.size() - 1) {
+                depth++;
+                subStr += "\"--" + depth + "\":" + this.partTree(node.children.get(i), depth) + "}";
+            } else {
+                depth++;
+                subStr += "\"--" + depth + "\":" + this.partTree(node.children.get(i), depth) + ",";
+            }
+        }
+        return subStr + "}";
+    }
+
 
     /**
      * 对从语料库中加载得到的短语结构树的词汇序列进行加工
@@ -562,5 +589,6 @@ public abstract class BasicPhraseStructureTree {
             Node n = (Node) obj;
             return this.value.equals(n.value);
         }
+
     }
 }
